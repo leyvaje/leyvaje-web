@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leyvaje</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <style>
+    :root {
+      --bg:      #ffffff;
+      --fg:      #000000;
+      --fg2:     #14213d;
+      --muted:   #999;
+      --accent:  #fca311;
+      --accent2: #14213d;
+      --border:  #e5e5e5;
+    }
+    [data-theme="dark"] {
+      --bg:      #0a0a0a;
+      --fg:      #e5e5e5;
+      --fg2:     #e5e5e5;
+      --muted:   #505050;
+      --accent:  #fca311;
+      --accent2: #fca311;
+      --border:  #1c1c1c;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 17px; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.3s, color 0.3s;
+      padding-bottom: 80px;
+    }
+
+    /* ── canvas layers ── */
+    #bg-wrap, #fx-wrap {
+      position: fixed; inset: 0;
+      pointer-events: none;
+    }
+    #bg-wrap { z-index: 0; }
+    #fx-wrap  { z-index: 50; }
+
+    /* ── layout ── */
+    .page {
+      position: relative; z-index: 10;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem;
+      /* card — frosted glass so animation shows around it */
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+      min-height: 100vh;
+    }
+    [data-theme="dark"] .page {
+      background: rgba(10, 10, 10, 0.84);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    /* ── wind badge ── */
+    #wind-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.68rem; font-weight: 400;
+      color: var(--muted); margin-top: 1rem;
+      letter-spacing: 0.04em;
+    }
+    #wind-arrow {
+      display: inline-block;
+      transition: transform 0.8s ease;
+      font-size: 0.75rem;
+      opacity: 0.6;
+    }
+
+    /* ── header ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3rem;
+    }
+    .site-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      color: var(--fg2);
+    }
+    .site-name span { color: var(--accent); }
+    #theme-btn {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 0.7rem; font-family: inherit;
+      font-weight: 400; letter-spacing: 0.06em;
+      padding: 0; transition: color 0.2s;
+    }
+    #theme-btn:hover { color: var(--fg); }
+
+    /* ── intro ── */
+    .intro { margin-bottom: 2.5rem; }
+    .intro .lead {
+      font-size: 1.2rem;
+      font-weight: 400;
+      line-height: 1.58;
+      color: var(--fg);
+      max-width: 520px;
+      margin-bottom: 0.8rem;
+    }
+    .intro .sub {
+      font-size: 0.92rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 480px;
+    }
+
+    /* ── social links ── */
+    .links {
+      display: flex; gap: 1.4rem; flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+    .links a {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .links a:hover { color: var(--accent); }
+
+    /* ── divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── section heading ── */
+    h2 {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+    }
+
+    /* ── work list ── */
+    .work-list { display: flex; flex-direction: column; }
+    .work-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 1.2rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .work-item:first-child { border-top: 1px solid var(--border); }
+    .work-period {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 300;
+      padding-top: 0.2rem;
+    }
+    .work-role {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    .work-co {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--accent2);
+      margin-top: 0.2rem;
+    }
+    .work-desc {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--muted);
+      margin-top: 0.45rem;
+    }
+    .work-tags {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-top: 0.55rem;
+    }
+    .tag {
+      font-size: 0.68rem; font-weight: 400;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.45rem; border-radius: 2px;
+    }
+
+    /* ── thoughts ── */
+    .thought-list { display: flex; flex-direction: column; }
+    .thought-item {
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 1.2rem;
+    }
+    .thought-item:first-child { border-top: 1px solid var(--border); }
+    .thought-date {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 300;
+      padding-top: 0.25rem;
+    }
+    .thought-text {
+      font-size: 1.05rem;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--fg);
+    }
+
+    /* ── photos grid ── */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 4px;
+      margin-top: 0.5rem;
+    }
+    .photo-item img {
+      width: 100%; aspect-ratio: 1;
+      object-fit: cover;
+      filter: grayscale(30%);
+      transition: filter 0.2s;
+      display: block;
+    }
+    .photo-item img:hover { filter: grayscale(0%); }
+    .photo-caption {
+      font-size: 0.72rem; color: var(--muted);
+      margin-top: 0.3rem; line-height: 1.4;
+    }
+
+    /* ── skills ── */
+    .skills-grid {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .skill-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 1.2rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .skill-row:first-child { border-top: 1px solid var(--border); }
+    .skill-cat { font-size: 0.75rem; font-weight: 500; color: var(--fg); padding-top: 0.1rem; }
+    .skill-list { font-weight: 300; color: var(--muted); line-height: 1.5; }
+
+    /* ── footer ── */
+    footer {
+      margin-top: 3rem;
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--muted);
+    }
+
+    /* ── music bar ── */
+    #music-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 0.55rem 1.5rem;
+      display: flex; flex-direction: column; gap: 3px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .kb-row { display: flex; gap: 3px; align-items: center; }
+    .kb-row-label {
+      font-size: 0.55rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      width: 36px; flex-shrink: 0;
+    }
+    .kb-key {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      width: 28px; height: 24px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      transition: all 0.07s;
+      flex-shrink: 0;
+    }
+    .kb-key .k { font-size: 7.5px; font-weight: 500; color: var(--muted); }
+    .kb-key .n { font-size: 5.5px; color: var(--muted); opacity: 0.65; }
+    .kb-key.sharp { background: var(--border); }
+    .kb-key.lit {
+      border-color: var(--accent);
+      background: rgba(252,163,17,0.1);
+    }
+    .kb-key.lit .k { color: var(--accent); }
+
+    /* ── toast ── */
+    #toast {
+      position: fixed; top: 1rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 200; pointer-events: none;
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; opacity: 0;
+      transition: opacity 0.12s;
+      font-family: inherit; font-weight: 400;
+    }
+    .bar-controls {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    #keys-toggle, #save-btn {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 0.6rem; font-family: inherit;
+      font-weight: 400; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s; padding: 0;
+    }
+    #keys-toggle:hover, #save-btn:hover { color: var(--accent); }
+    #kb-rows { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 0; opacity: 0; }
+    #kb-rows.visible { max-height: 80px; opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div id="bg-wrap"></div>
+<div id="fx-wrap"></div>
+<div id="toast"></div>
+
+<div class="page">
+
+  <header>
+    <a href="/" class="site-name">leyvaje<span>.</span></a>
+    <button id="theme-btn">dark</button>
+  </header>
+
+  <div class="intro">
+    <p class="lead">Full-stack and mobile developer with 10+ years building production-grade apps — iOS, Flutter, and backend systems. Based in Attendorn, Germany.</p>
+    <p class="sub">I write short thoughts, share music, and post the occasional photo. Basketball, jazz, guitar, and plant-based food on the side.</p>
+  </div>
+
+  <div id="wind-badge">
+    <span id="wind-arrow">→</span>
+    <span id="wind-text">fetching wind…</span>
+  </div>
+
+  <nav class="links">
+    <a href="https://github.com/leyvaje"          target="_blank" rel="noopener">GitHub</a>
+    <a href="https://twitter.com/leyvaje"         target="_blank" rel="noopener">Twitter</a>
+    <a href="https://linkedin.com/in/-leyva"      target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://instagram.com/leyvajex"      target="_blank" rel="noopener">Instagram</a>
+    <a href="https://soundcloud.com/leyvaje"      target="_blank" rel="noopener">SoundCloud</a>
+  </nav>
+
+  <hr>
+
+  <h2>Experience</h2>
+  <div class="work-list">
+
+    <div class="work-item">
+      <div class="work-period">2018 – now</div>
+      <div class="work-info">
+        <div class="work-role">Full-Stack Software Developer</div>
+        <div class="work-co">Spendit AG · Munich</div>
+        <div class="work-desc">Lead developer and release owner for the spendit / myBenefits mobile apps. Built the Flutter app from scratch, integrated Solaris Bank, delivered Apple Pay and Apple Watch wallet payments. Designed REST microservices in Scala on AWS.</div>
+        <div class="work-tags">
+          <span class="tag">Flutter</span>
+          <span class="tag">Swift</span>
+          <span class="tag">Scala</span>
+          <span class="tag">AWS</span>
+          <span class="tag">CircleCI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-item">
+      <div class="work-period">2017 – 2018</div>
+      <div class="work-info">
+        <div class="work-role">iOS Developer</div>
+        <div class="work-co">Outbank · Verivox GmbH</div>
+        <div class="work-desc">Feature development and fixes for a production banking app. Contributed to the macOS application.</div>
+        <div class="work-tags">
+          <span class="tag">Swift</span>
+          <span class="tag">RxSwift</span>
+          <span class="tag">macOS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-item">
+      <div class="work-period">2015 – 2017</div>
+      <div class="work-info">
+        <div class="work-role">iOS Developer</div>
+        <div class="work-co">Freeletics GmbH · Munich</div>
+        <div class="work-desc">Feature development for a high-scale fitness app used by millions of users worldwide.</div>
+        <div class="work-tags">
+          <span class="tag">Swift</span>
+          <span class="tag">iOS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-item">
+      <div class="work-period">2012 – 2015</div>
+      <div class="work-info">
+        <div class="work-role">Online Marketing Manager</div>
+        <div class="work-co">Wirecard AG</div>
+        <div class="work-desc">Owned SEO, SEM, and affiliate strategy across markets.</div>
+        <div class="work-tags">
+          <span class="tag">SEO</span>
+          <span class="tag">SEM</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <h2>Skills</h2>
+  <div class="skills-grid">
+    <div class="skill-row">
+      <div class="skill-cat">Mobile</div>
+      <div class="skill-list">Flutter · Dart · Swift · SwiftUI · RxSwift · Combine</div>
+    </div>
+    <div class="skill-row">
+      <div class="skill-cat">Backend</div>
+      <div class="skill-list">Scala · Python · REST APIs · AWS · PostgreSQL</div>
+    </div>
+    <div class="skill-row">
+      <div class="skill-cat">DevOps</div>
+      <div class="skill-list">Git · CircleCI · Fastlane · Firebase · GitHub Copilot</div>
+    </div>
+    <div class="skill-row">
+      <div class="skill-cat">Web</div>
+      <div class="skill-list">TypeScript · JavaScript · HTML · CSS</div>
+    </div>
+    <div class="skill-row">
+      <div class="skill-cat">Languages</div>
+      <div class="skill-list">Spanish (native) · English (C2) · German (C1) · Swedish (A1)</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>Education</h2>
+  <div class="work-list">
+    <div class="work-item">
+      <div class="work-period">Sweden</div>
+      <div class="work-info">
+        <div class="work-role">M.Sc. Economics</div>
+        <div class="work-co">Jönköping International Business School</div>
+      </div>
+    </div>
+    <div class="work-item">
+      <div class="work-period">Mexico</div>
+      <div class="work-info">
+        <div class="work-role">B.A. Marketing</div>
+        <div class="work-co">Universidad Anáhuac Mayab</div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>Thoughts</h2>
+  <div class="thought-list" id="thoughts-list">
+    <div class="thought-item" style="opacity:0.4">
+      <div class="thought-date">—</div>
+      <div class="thought-text">Loading…</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>Photos</h2>
+  <div id="photos-list" style="display:none">
+    <!-- populated from Discord posts -->
+  </div>
+
+  <hr>
+
+  <footer>© 2026 Jose Enrique Leyva N. · Attendorn, Germany</footer>
+
+</div>
+
+<!-- Music bar -->
+<div id="music-bar">
+  <div class="bar-controls">
+    <button id="keys-toggle">hide keys</button>
+    <button id="save-btn">save art</button>
+  </div>
+  <div id="kb-rows">
+    <div class="kb-row" id="row-beats"><span class="kb-row-label">beats</span></div>
+    <div class="kb-row" id="row-mel1"><span class="kb-row-label">C4–B4</span></div>
+    <div class="kb-row" id="row-mel2"><span class="kb-row-label">C5–</span></div>
+  </div>
+</div>
+
+<script>
+// ── THEME ──────────────────────────────────────────────────────
+const html = document.documentElement;
+const themeBtn = document.getElementById('theme-btn');
+themeBtn.addEventListener('click', () => {
+  const dark = html.dataset.theme === 'dark';
+  html.dataset.theme = dark ? 'light' : 'dark';
+  themeBtn.textContent = dark ? 'dark' : 'light';
+});
+
+// ── KEY MAPS ───────────────────────────────────────────────────
+const BEATS = [
+  {key:'1',label:'Kick',  color:'#c0392b',type:'kick'},
+  {key:'2',label:'Snare', color:'#888',   type:'snare'},
+  {key:'3',label:'CHH',   color:'#c8a800',type:'hihat'},
+  {key:'4',label:'OHH',   color:'#c06000',type:'openhat'},
+  {key:'5',label:'Clap',  color:'#c03020',type:'clap'},
+  {key:'6',label:'LTom',  color:'#6020a0',type:'lowtom'},
+  {key:'7',label:'MTom',  color:'#8030b0',type:'midtom'},
+  {key:'8',label:'Crash', color:'#008090',type:'crash'},
+  {key:'9',label:'Ride',  color:'#306060',type:'ride'},
+  {key:'0',label:'Perc',  color:'#a06000',type:'perc'},
+];
+const MEL1 = [
+  {key:'q',note:'C4', label:'Do',  sharp:false},
+  {key:'w',note:'C#4',label:'Do#', sharp:true },
+  {key:'e',note:'D4', label:'Re',  sharp:false},
+  {key:'r',note:'D#4',label:'Re#', sharp:true },
+  {key:'t',note:'E4', label:'Mi',  sharp:false},
+  {key:'y',note:'F4', label:'Fa',  sharp:false},
+  {key:'u',note:'F#4',label:'Fa#', sharp:true },
+  {key:'i',note:'G4', label:'Sol', sharp:false},
+  {key:'o',note:'G#4',label:'So#', sharp:true },
+  {key:'p',note:'A4', label:'La',  sharp:false},
+  {key:'[',note:'A#4',label:'La#', sharp:true },
+  {key:']',note:'B4', label:'Si',  sharp:false},
+];
+const MEL2 = [
+  {key:'a',note:'C5', label:'Do',  sharp:false},
+  {key:'s',note:'C#5',label:'Do#', sharp:true },
+  {key:'d',note:'D5', label:'Re',  sharp:false},
+  {key:'f',note:'D#5',label:'Re#', sharp:true },
+  {key:'g',note:'E5', label:'Mi',  sharp:false},
+  {key:'h',note:'F5', label:'Fa',  sharp:false},
+  {key:'j',note:'F#5',label:'Fa#', sharp:true },
+  {key:'k',note:'G5', label:'Sol', sharp:false},
+  {key:'l',note:'G#5',label:'So#', sharp:true },
+  {key:';',note:'A5', label:'La',  sharp:false},
+  {key:"'",note:'A#5',label:'La#', sharp:true },
+];
+const ALL = {};
+BEATS.forEach(k => ALL[k.key] = {...k, kind:'beat'});
+MEL1.forEach(k  => ALL[k.key] = {...k, kind:'melody', color:'#fca311'});
+MEL2.forEach(k  => ALL[k.key] = {...k, kind:'melody', color:'#8ab4d4'});
+
+// ── BUILD KEYBOARD UI ─────────────────────────────────────────
+function mkKey(kd) {
+  const d = document.createElement('div');
+  d.className = 'kb-key' + (kd.sharp ? ' sharp' : '');
+  d.id = 'k-' + kd.key;
+  d.innerHTML = `<span class="k">${kd.key.toUpperCase()}</span><span class="n">${kd.label||kd.note||''}</span>`;
+  return d;
+}
+BEATS.forEach(k => document.getElementById('row-beats').appendChild(mkKey(k)));
+MEL1.forEach(k  => document.getElementById('row-mel1').appendChild(mkKey(k)));
+MEL2.forEach(k  => document.getElementById('row-mel2').appendChild(mkKey(k)));
+
+function litKey(k, on) {
+  const el = document.getElementById('k-' + k);
+  if (el) el.classList.toggle('lit', on);
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────
+let audioReady = false;
+let mel, kick, snare, hh, ohh, clap, ltom, mtom, crash, ride, perc;
+
+async function initAudio() {
+  if (audioReady) return;
+  await Tone.start(); audioReady = true;
+  const rev = new Tone.Reverb({decay:1.8, wet:0.15}).toDestination();
+  mel   = new Tone.PolySynth(Tone.Synth, {oscillator:{type:'triangle'}, envelope:{attack:0.02,decay:0.4,sustain:0.3,release:1.5}, volume:-11}).connect(rev);
+  kick  = new Tone.MembraneSynth({pitchDecay:0.08,octaves:6,volume:-4}).toDestination();
+  snare = new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:0.001,decay:0.2,sustain:0,release:0.05},volume:-13}).toDestination();
+  hh    = new Tone.MetalSynth({frequency:400,envelope:{attack:0.001,decay:0.07,release:0.01},harmonicity:5.1,modulationIndex:32,resonance:4000,octaves:1.5,volume:-20}).toDestination();
+  ohh   = new Tone.MetalSynth({frequency:400,envelope:{attack:0.001,decay:0.45,release:0.1},harmonicity:5.1,modulationIndex:32,resonance:4000,octaves:1.5,volume:-22}).toDestination();
+  clap  = new Tone.NoiseSynth({noise:{type:'pink'},envelope:{attack:0.005,decay:0.12,sustain:0,release:0.05},volume:-15}).toDestination();
+  ltom  = new Tone.MembraneSynth({pitchDecay:0.09,octaves:4,volume:-6}).toDestination();
+  mtom  = new Tone.MembraneSynth({pitchDecay:0.06,octaves:5,volume:-6}).toDestination();
+  crash = new Tone.MetalSynth({frequency:300,envelope:{attack:0.001,decay:1.4,release:0.4},harmonicity:5.1,modulationIndex:64,resonance:8000,octaves:3,volume:-18}).toDestination();
+  ride  = new Tone.MetalSynth({frequency:250,envelope:{attack:0.001,decay:0.6,release:0.1},harmonicity:5.1,modulationIndex:48,resonance:6000,octaves:2,volume:-21}).toDestination();
+  perc  = new Tone.MembraneSynth({pitchDecay:0.04,octaves:3,volume:-8}).toDestination();
+}
+
+function play(kd) {
+  if (!audioReady) return;
+  if (kd.kind === 'melody') { mel.triggerAttackRelease(kd.note,'8n'); return; }
+  switch(kd.type) {
+    case 'kick':    kick.triggerAttackRelease('C1','8n'); break;
+    case 'snare':   snare.triggerAttackRelease('16n'); break;
+    case 'hihat':   hh.triggerAttackRelease('32n'); break;
+    case 'openhat': ohh.triggerAttackRelease('8n'); break;
+    case 'clap':    clap.triggerAttackRelease('16n'); break;
+    case 'lowtom':  ltom.triggerAttackRelease('G1','8n'); break;
+    case 'midtom':  mtom.triggerAttackRelease('C2','8n'); break;
+    case 'crash':   crash.triggerAttackRelease('8n'); break;
+    case 'ride':    ride.triggerAttackRelease('8n'); break;
+    case 'perc':    perc.triggerAttackRelease('A2','16n'); break;
+  }
+}
+
+// ── WIND DATA ─────────────────────────────────────────────────
+// Global wind state — read by p5 sketch each frame
+window.windSpeed = 2;   // m/s default
+window.windDir   = 270; // degrees meteorological (from West = toward East)
+
+const ATTENDORN = { lat: 51.1167, lon: 7.9167 };
+
+async function fetchWind(lat, lon) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=ms&timezone=auto`;
+  const res  = await fetch(url);
+  const data = await res.json();
+  return {
+    speed: data.current.wind_speed_10m,
+    dir:   data.current.wind_direction_10m,
+  };
+}
+
+function applyWind({ speed, dir }) {
+  window.windSpeed = speed;
+  window.windDir   = dir;
+
+  // Meteorological dir: "wind FROM X°". Arrow points where wind goes TO.
+  const towardDeg = (dir + 180) % 360;
+  const towardRad = (towardDeg - 90) * (Math.PI / 180); // rotate so 0° = up
+
+  // Rotate arrow CSS
+  const arrow = document.getElementById('wind-arrow');
+  if (arrow) arrow.style.transform = `rotate(${towardDeg}deg)`;
+
+  // Beaufort description
+  const bft = speed < 0.5 ? 'calm' : speed < 1.5 ? 'light air' : speed < 3.3 ? 'light breeze'
+            : speed < 5.4 ? 'gentle breeze' : speed < 7.9 ? 'moderate breeze'
+            : speed < 10.7 ? 'fresh breeze' : speed < 13.8 ? 'strong breeze' : 'near gale';
+
+  const compass = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const compassDir = compass[Math.round(dir / 22.5) % 16];
+
+  const txt = document.getElementById('wind-text');
+  if (txt) txt.textContent = `${speed.toFixed(1)} m/s ${compassDir} — ${bft}`;
+}
+
+async function initWind() {
+  try {
+    // Try user's location first
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, { timeout: 4000 })
+    );
+    const wind = await fetchWind(pos.coords.latitude, pos.coords.longitude);
+    applyWind(wind);
+    const txt = document.getElementById('wind-text');
+    if (txt && txt.textContent.includes('m/s')) {
+      // prepend "your location" context already shown via compass
+    }
+  } catch {
+    // Fallback: Attendorn 57439
+    try {
+      const wind = await fetchWind(ATTENDORN.lat, ATTENDORN.lon);
+      applyWind(wind);
+      const txt = document.getElementById('wind-text');
+      if (txt) txt.textContent = 'Attendorn · ' + txt.textContent;
+    } catch {
+      const txt = document.getElementById('wind-text');
+      if (txt) txt.textContent = 'wind unavailable';
+    }
+  }
+}
+
+initWind();
+
+// ── BACKGROUND — Perlin flow field + mouse gravity ─────────────
+new p5(s => {
+  const PARTICLE_COUNT = 340;
+  const NOISE_SCALE    = 0.0028;
+  const NOISE_SPEED    = 0.00045;
+  const particles      = [];
+  let   bgCnv, t = 0;
+  let   prevMX = 0, prevMY = 0, mouseVX = 0, mouseVY = 0;
+
+  // ── Particle ──────────────────────────────────────────────────
+  class Particle {
+    constructor() { this.reset(true); }
+
+    reset(anywhere = false) {
+      this.x  = anywhere ? s.random(s.width)  : s.random(-20, s.width  + 20);
+      this.y  = anywhere ? s.random(s.height) : s.random(-20, s.height + 20);
+      this.vx = 0; this.vy = 0;
+      this.age = 0;
+      this.maxAge = s.random(120, 320);
+      this.sz  = s.random(1.2, 3.2);
+      this.dot = s.random() > 0.15; // 85% dots, 15% short streaks
+    }
+
+    update() {
+      // Flow field angle from Perlin noise
+      const noiseAngle = s.noise(this.x * NOISE_SCALE, this.y * NOISE_SCALE, t) * Math.PI * 4;
+
+      // Wind bias — convert meteorological dir to movement vector
+      // "wind FROM X°" → particles travel toward (X+180)°
+      const wDir    = ((window.windDir || 270) + 180) % 360;
+      const wRad    = wDir * Math.PI / 180;
+      const wSpeed  = Math.min(window.windSpeed || 2, 15); // cap at 15 m/s
+      const wStr    = wSpeed * 0.04; // scale to canvas units
+
+      const fSpeed  = 0.45;
+      this.vx = this.vx * 0.72 + Math.cos(noiseAngle) * fSpeed + Math.cos(wRad) * wStr;
+      this.vy = this.vy * 0.72 + Math.sin(noiseAngle) * fSpeed + Math.sin(wRad) * wStr;
+
+      // Mouse gravity — pulls particles toward cursor
+      const mx = s.mouseX, my = s.mouseY;
+      const dx = mx - this.x, dy = my - this.y;
+      const dist2 = dx*dx + dy*dy;
+      if (dist2 > 100 && dist2 < 160000) {
+        const force = 18 / dist2;
+        this.vx += dx * force;
+        this.vy += dy * force;
+      }
+
+      // Mouse velocity drag — fast movement creates turbulence
+      const mSpeed = Math.sqrt(mouseVX*mouseVX + mouseVY*mouseVY);
+      if (mSpeed > 1) {
+        this.vx += mouseVX * 0.012;
+        this.vy += mouseVY * 0.012;
+      }
+
+      // Cap speed
+      const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+      if (spd > 2.8) { this.vx = (this.vx/spd)*2.8; this.vy = (this.vy/spd)*2.8; }
+
+      this.x  += this.vx;
+      this.y  += this.vy;
+      this.age++;
+
+      // Wrap edges
+      if (this.x < -30 || this.x > s.width+30 || this.y < -30 || this.y > s.height+30) {
+        this.reset();
+      }
+      if (this.age > this.maxAge) this.reset();
+    }
+
+    draw(dotC) {
+      const lifeRatio = 1 - this.age / this.maxAge;
+      const alpha = lifeRatio * 0.65;
+      s.fill(dotC, dotC, dotC, alpha);
+
+      if (this.dot) {
+        s.noStroke();
+        s.ellipse(this.x, this.y, this.sz * lifeRatio * 2);
+      } else {
+        // Short streak — draw line in velocity direction
+        s.noFill();
+        s.stroke(dotC, dotC, dotC, alpha * 0.8);
+        s.strokeWeight(0.7);
+        const len = 6;
+        s.line(this.x, this.y,
+               this.x - this.vx * len, this.y - this.vy * len);
+      }
+    }
+  }
+
+  s.setup = () => {
+    bgCnv = s.createCanvas(innerWidth, innerHeight);
+    bgCnv.parent('bg-wrap');
+    s.colorMode(s.RGB, 255, 255, 255, 1);
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    // Save with @leyvaje watermark
+    window._saveBg = () => {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      const wC = isDark ? 255 : 0;
+      s.fill(wC, wC, wC, 0.3);
+      s.noStroke();
+      s.textSize(10);
+      s.textFont('Inter, sans-serif');
+      s.textAlign(s.RIGHT, s.BOTTOM);
+      s.text('@leyvaje', s.width - 14, s.height - 14);
+      s.saveCanvas(bgCnv.elt, 'leyvaje-art', 'png');
+    };
+  };
+
+  s.draw = () => {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    const bgV  = isDark ?  8 : 250;
+    const dotC = isDark ? 220 :  30;
+
+    // Slow fade → trails build up organically
+    s.background(bgV, bgV, bgV, 0.08);
+
+    // Track mouse velocity
+    mouseVX = mouseVX * 0.75 + (s.mouseX - prevMX) * 0.25;
+    mouseVY = mouseVY * 0.75 + (s.mouseY - prevMY) * 0.25;
+    prevMX = s.mouseX; prevMY = s.mouseY;
+
+    t += NOISE_SPEED;
+
+    for (const p of particles) { p.update(); p.draw(dotC); }
+  };
+
+  s.windowResized = () => {
+    s.resizeCanvas(innerWidth, innerHeight);
+    // Respawn after resize
+    for (const p of particles) p.reset(true);
+  };
+}, 'bg-wrap');
+
+// ── PATATAP ANIMATIONS ────────────────────────────────────────
+const anims = [];
+
+new p5(s => {
+  s.setup = () => {
+    const c = s.createCanvas(innerWidth,innerHeight);
+    c.parent('fx-wrap'); c.style('pointer-events','none');
+    s.colorMode(s.RGB,255,255,255,1);
+  };
+  s.draw = () => {
+    s.clear();
+    for(let i=anims.length-1;i>=0;i--) {
+      anims[i].update(s); anims[i].draw(s);
+      if(anims[i].dead) anims.splice(i,1);
+    }
+  };
+  s.windowResized = () => s.resizeCanvas(innerWidth,innerHeight);
+}, 'fx-wrap');
+
+const CX=()=>innerWidth/2, CY=()=>innerHeight/2;
+function rr(h){return parseInt(h.slice(1,3),16)}
+function rg(h){return parseInt(h.slice(3,5),16)}
+function rb(h){return parseInt(h.slice(5,7),16)}
+
+class Ripple {
+  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.rings=[0,1,2,3].map(i=>({r:i*22,sp:5+i*3}))}
+  update(){this.life-=0.015;this.rings.forEach(r=>r.r+=r.sp);if(this.life<=0)this.dead=true}
+  draw(s){this.rings.forEach((r,i)=>{const a=this.life*(1-i*0.22);if(a<=0)return;s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),a);s.strokeWeight(2);s.ellipse(this.cx,this.cy,r.r*2,r.r*2)})}
+}
+class Burst {
+  constructor(c,n=14,sp=11){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.lines=Array.from({length:n},(_,i)=>({angle:(i/n)*Math.PI*2+Math.random()*0.3,len:0,sp:sp+Math.random()*5}))}
+  update(){this.life-=0.022;this.lines.forEach(l=>l.len+=l.sp);if(this.life<=0)this.dead=true}
+  draw(s){s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);this.lines.forEach(l=>{s.strokeWeight(1.5*this.life);s.line(this.cx+Math.cos(l.angle)*18,this.cy+Math.sin(l.angle)*18,this.cx+Math.cos(l.angle)*(18+l.len),this.cy+Math.sin(l.angle)*(18+l.len))})}
+}
+class Scatter {
+  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.dots=Array.from({length:28},()=>({x:CX(),y:CY(),vx:(Math.random()-.5)*14,vy:(Math.random()-.5)*14,r:Math.random()*2.5+1}))}
+  update(){this.life-=0.028;this.dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;d.vx*=0.87;d.vy*=0.87});if(this.life<=0)this.dead=true}
+  draw(s){s.fill(rr(this.c),rg(this.c),rb(this.c),this.life*0.9);s.noStroke();this.dots.forEach(d=>s.ellipse(d.x,d.y,d.r*2*this.life))}
+}
+class Ring {
+  constructor(c,w=7){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=10;this.w=w}
+  update(){this.life-=0.018;this.r+=22;if(this.life<=0)this.dead=true}
+  draw(s){s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);s.strokeWeight(this.w*this.life);s.ellipse(this.cx,this.cy,this.r*2,this.r*2)}
+}
+class Flash {
+  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=30}
+  update(){this.life-=0.035;this.r+=22;if(this.life<=0)this.dead=true}
+  draw(s){s.fill(rr(this.c),rg(this.c),rb(this.c),this.life*0.18);s.noStroke();s.rect(0,0,s.width,s.height);s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.7);s.strokeWeight(1.5);[0,45,100].forEach(o=>s.ellipse(this.cx,this.cy,(this.r+o)*2,(this.r+o)*2))}
+}
+class Tri {
+  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=20;this.rot=Math.random()*Math.PI}
+  update(){this.life-=0.018;this.r+=12;this.rot+=0.04;if(this.life<=0)this.dead=true}
+  draw(s){s.push();s.translate(this.cx,this.cy);s.rotate(this.rot);s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);s.strokeWeight(2*this.life);s.triangle(0,-this.r,this.r*0.866,this.r*0.5,-this.r*0.866,this.r*0.5);s.triangle(0,this.r,this.r*0.866,-this.r*0.5,-this.r*0.866,-this.r*0.5);s.pop()}
+}
+
+function spawnAnim(kd) {
+  if (kd.kind==='melody') { anims.push(new Ripple(kd.color)); return; }
+  switch(kd.type){
+    case 'kick':    anims.push(new Ring('#c0392b',9)); break;
+    case 'snare':   anims.push(new Burst('#aaaaaa',16,13)); break;
+    case 'hihat':   anims.push(new Scatter('#c8a800')); break;
+    case 'openhat': anims.push(new Burst('#c06000',8,8)); break;
+    case 'clap':    anims.push(new Ring('#c03020',4)); break;
+    case 'lowtom':  anims.push(new Ring('#6020a0',7)); break;
+    case 'midtom':  anims.push(new Tri('#8030b0')); break;
+    case 'crash':   anims.push(new Flash('#008090')); break;
+    case 'ride':    anims.push(new Burst('#306060',20,9)); break;
+    case 'perc':    anims.push(new Scatter('#a06000')); break;
+  }
+}
+
+// ── KEYBOARD EVENTS ───────────────────────────────────────────
+const held=new Set(); let tt;
+
+document.addEventListener('keydown', async e => {
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  const k=e.key.toLowerCase(); if(held.has(k)) return; held.add(k);
+  await initAudio();
+  const kd=ALL[k]||ALL[e.key]; if(!kd) return;
+  e.preventDefault();
+  play(kd); spawnAnim(kd);
+  const toast=document.getElementById('toast');
+  toast.textContent = kd.kind==='melody' ? `${kd.key.toUpperCase()} · ${kd.label} (${kd.note})` : `${kd.key} · ${kd.label}`;
+  toast.style.color = kd.color; toast.style.opacity='1';
+  clearTimeout(tt); tt=setTimeout(()=>toast.style.opacity='0',900);
+  litKey(k,true);
+});
+document.addEventListener('keyup', e => { held.delete(e.key.toLowerCase()); litKey(e.key.toLowerCase(),false); });
+
+// ── SAVE ──────────────────────────────────────────────────────
+document.getElementById('save-btn').addEventListener('click', ()=>window._saveBg&&window._saveBg());
+
+// ── KEYS TOGGLE ───────────────────────────────────────────────
+const keysToggle = document.getElementById('keys-toggle');
+const kbRows = document.getElementById('kb-rows');
+let keysVisible = false;
+keysToggle.addEventListener('click', () => {
+  keysVisible = !keysVisible;
+  kbRows.classList.toggle('visible', keysVisible);
+  keysToggle.textContent = keysVisible ? 'hide keys' : 'show keys';
+});
+</script>
+
+<script type="module">
+// ── SUPABASE CONTENT LOADER ────────────────────────────────────
+// Replace these two values after you create your Supabase project
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';          // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';    // public anon key (safe to expose)
+
+// Skip if not configured yet
+if (SUPABASE_URL.startsWith('YOUR')) {
+  document.getElementById('thoughts-list').innerHTML =
+    `<div class="thought-item" style="opacity:0.4">
+       <div class="thought-date">—</div>
+       <div class="thought-text">Connect Supabase to see posts from Discord.</div>
+     </div>`;
+} else {
+  loadPosts();
+}
+
+async function loadPosts() {
+  try {
+    const res  = await fetch(
+      `${SUPABASE_URL}/rest/v1/posts?order=created_at.desc&limit=50`,
+      { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` } }
+    );
+    const posts = await res.json();
+    renderPosts(posts);
+  } catch (e) {
+    console.warn('Could not load posts:', e);
+  }
+}
+
+function renderPosts(posts) {
+  const thoughts = posts.filter(p => p.type === 'thought' || p.type === 'link');
+  const photos   = posts.filter(p => p.type === 'photo');
+
+  // ── Thoughts ──
+  const tList = document.getElementById('thoughts-list');
+  if (thoughts.length === 0) {
+    tList.innerHTML = `<div class="thought-item" style="opacity:0.35">
+      <div class="thought-date">—</div>
+      <div class="thought-text">No thoughts yet. Post in Discord to add one.</div>
+    </div>`;
+  } else {
+    tList.innerHTML = thoughts.map(p => {
+      const date = new Date(p.created_at).toLocaleDateString('en-US', { month:'short', year:'numeric' });
+      const txt  = p.type === 'link'
+        ? `<a href="${p.content}" target="_blank" rel="noopener" style="color:var(--accent);word-break:break-all">${p.content}</a>`
+        : p.content;
+      return `<div class="thought-item">
+        <div class="thought-date">${date}</div>
+        <div class="thought-text">${txt}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Photos ──
+  const pSection = document.getElementById('photos-list');
+  if (photos.length > 0) {
+    pSection.style.display = 'block';
+    pSection.innerHTML = `<div class="photos-grid">
+      ${photos.map(p => `
+        <div class="photo-item">
+          <img src="${p.media_url}" alt="${p.content || ''}" loading="lazy">
+          ${p.content ? `<div class="photo-caption">${p.content}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeyvajeWeb — Beat Maker</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+    }
+    canvas { display: block; }
+    #keyboard-guide {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+    .key-row {
+      display: flex;
+      gap: 6px;
+    }
+    .key {
+      width: 48px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      line-height: 1.3;
+      text-align: center;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    .key .key-label { font-size: 11px; font-weight: bold; }
+    .key .key-name  { font-size: 8px; opacity: 0.75; }
+    #start-msg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.4);
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #label-display {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+
+<div id="start-msg">press any key to start</div>
+<div id="label-display" id="label-display"></div>
+
+<div id="keyboard-guide"></div>
+
+<script>
+// ─── KEY DEFINITIONS ───────────────────────────────────────────────────────
+
+const MELODY_KEYS = [
+  { key: '1', note: 'C4',  label: 'Do',  color: '#f5c6a0' },
+  { key: '2', note: 'D4',  label: 'Re',  color: '#f5e6a0' },
+  { key: '3', note: 'E4',  label: 'Mi',  color: '#c6f5a0' },
+  { key: '4', note: 'F4',  label: 'Fa',  color: '#a0f5e6' },
+  { key: '5', note: 'G4',  label: 'Sol', color: '#a0c6f5' },
+  { key: '6', note: 'A4',  label: 'La',  color: '#c6a0f5' },
+  { key: '7', note: 'B4',  label: 'Si',  color: '#f5a0c6' },
+  { key: '8', note: 'C5',  label: 'Do²', color: '#f5f0a0' },
+];
+
+const BEAT_KEYS = [
+  { key: 'y', type: 'kick',     label: 'Kick',     color: '#8b1a1a' },
+  { key: 'u', type: 'snare',    label: 'Snare',    color: '#d0d0d0' },
+  { key: 'i', type: 'hihat',    label: 'HiHat',    color: '#f0d000' },
+  { key: 'o', type: 'openhat',  label: 'Open Hat', color: '#e08020' },
+  { key: 'p', type: 'clap',     label: 'Clap',     color: '#e05010' },
+  { key: '[', type: 'lowtom',   label: 'Low Tom',  color: '#6020a0' },
+  { key: ']', type: 'midtom',   label: 'Mid Tom',  color: '#9040d0' },
+  { key: '-', type: 'crash',    label: 'Crash',    color: '#00d0d0' },
+];
+
+const ALL_KEYS = {};
+MELODY_KEYS.forEach(k => ALL_KEYS[k.key] = k);
+BEAT_KEYS.forEach(k  => ALL_KEYS[k.key] = k);
+
+// ─── TONE.JS SETUP ─────────────────────────────────────────────────────────
+
+let audioStarted = false;
+let melodySynth, kickSynth, snareSynth, hihatSynth, openHatSynth,
+    clapSynth, lowtomSynth, midtomSynth, crashSynth;
+
+function initAudio() {
+  if (audioStarted) return;
+  audioStarted = true;
+
+  const reverb = new Tone.Reverb({ decay: 1.5, wet: 0.25 }).toDestination();
+
+  melodySynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'triangle' },
+    envelope: { attack: 0.02, decay: 0.3, sustain: 0.4, release: 1.2 },
+    volume: -8
+  }).connect(reverb);
+
+  kickSynth = new Tone.MembraneSynth({
+    pitchDecay: 0.07, octaves: 6,
+    envelope: { attack: 0.001, decay: 0.35, sustain: 0, release: 0.1 },
+    volume: -4
+  }).toDestination();
+
+  snareSynth = new Tone.NoiseSynth({
+    noise: { type: 'white' },
+    envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 },
+    volume: -10
+  }).toDestination();
+
+  hihatSynth = new Tone.MetalSynth({
+    frequency: 400, envelope: { attack: 0.001, decay: 0.06, release: 0.01 },
+    harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5,
+    volume: -18
+  }).toDestination();
+
+  openHatSynth = new Tone.MetalSynth({
+    frequency: 400, envelope: { attack: 0.001, decay: 0.4, release: 0.1 },
+    harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5,
+    volume: -20
+  }).toDestination();
+
+  clapSynth = new Tone.NoiseSynth({
+    noise: { type: 'pink' },
+    envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.05 },
+    volume: -12
+  }).toDestination();
+
+  lowtomSynth = new Tone.MembraneSynth({
+    pitchDecay: 0.08, octaves: 4,
+    envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 },
+    volume: -6
+  }).toDestination();
+
+  midtomSynth = new Tone.MembraneSynth({
+    pitchDecay: 0.06, octaves: 5,
+    envelope: { attack: 0.001, decay: 0.25, sustain: 0, release: 0.1 },
+    volume: -6
+  }).toDestination();
+
+  crashSynth = new Tone.MetalSynth({
+    frequency: 300, envelope: { attack: 0.001, decay: 1.2, release: 0.3 },
+    harmonicity: 5.1, modulationIndex: 64, resonance: 8000, octaves: 3,
+    volume: -16
+  }).toDestination();
+
+  document.getElementById('start-msg').style.opacity = '0';
+}
+
+function triggerSound(keyDef) {
+  if (!audioStarted) return;
+  if (keyDef.note) {
+    melodySynth.triggerAttackRelease(keyDef.note, '8n');
+  } else {
+    switch(keyDef.type) {
+      case 'kick':    kickSynth.triggerAttackRelease('C1', '8n'); break;
+      case 'snare':   snareSynth.triggerAttackRelease('16n'); break;
+      case 'hihat':   hihatSynth.triggerAttackRelease('16n'); break;
+      case 'openhat': openHatSynth.triggerAttackRelease('8n'); break;
+      case 'clap':    clapSynth.triggerAttackRelease('16n'); break;
+      case 'lowtom':  lowtomSynth.triggerAttackRelease('G1', '8n'); break;
+      case 'midtom':  midtomSynth.triggerAttackRelease('C2', '8n'); break;
+      case 'crash':   crashSynth.triggerAttackRelease('8n'); break;
+    }
+  }
+}
+
+// ─── p5.js SKETCH ──────────────────────────────────────────────────────────
+
+const animations = [];
+
+new p5(function(p) {
+
+  p.setup = function() {
+    const cnv = p.createCanvas(window.innerWidth, window.innerHeight);
+    cnv.style('position', 'fixed');
+    cnv.style('top', '0');
+    cnv.style('left', '0');
+    p.colorMode(p.RGB, 255, 255, 255, 1);
+  };
+
+  p.draw = function() {
+    p.background(0, 0, 0, 0.18);
+    for (let i = animations.length - 1; i >= 0; i--) {
+      animations[i].update();
+      animations[i].draw(p);
+      if (animations[i].dead) animations.splice(i, 1);
+    }
+  };
+
+  p.windowResized = function() {
+    p.resizeCanvas(window.innerWidth, window.innerHeight);
+  };
+});
+
+// ─── ANIMATION CLASSES ─────────────────────────────────────────────────────
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+
+class RippleAnim {
+  constructor(color, cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.c = hexToRgb(color);
+    this.rings = Array.from({length: 4}, (_,i) => ({ r: i*30, alpha: 1 - i*0.18, speed: 4+i*2 }));
+    this.dead = false;
+    this.life = 1;
+  }
+  update() {
+    this.life -= 0.012;
+    this.rings.forEach(ring => { ring.r += ring.speed; ring.alpha -= 0.018; });
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    this.rings.forEach(ring => {
+      if (ring.alpha <= 0) return;
+      p.noFill();
+      p.stroke(this.c.r, this.c.g, this.c.b, Math.max(0, ring.alpha * this.life));
+      p.strokeWeight(2.5);
+      p.ellipse(this.cx, this.cy, ring.r*2, ring.r*2);
+    });
+  }
+}
+
+class KickAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.r = 10; this.life = 1;
+    this.dead = false;
+  }
+  update() {
+    this.r += 22; this.life -= 0.022;
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.noFill();
+    p.stroke(139, 26, 26, this.life * 0.9);
+    p.strokeWeight(6 * this.life);
+    p.ellipse(this.cx, this.cy, this.r*2, this.r*2);
+    p.stroke(200, 60, 60, this.life * 0.5);
+    p.strokeWeight(2);
+    p.ellipse(this.cx, this.cy, this.r*2.4, this.r*2.4);
+  }
+}
+
+class SnareAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.life = 1; this.dead = false;
+    this.lines = Array.from({length: 16}, (_,i) => ({
+      angle: (i/16)*Math.PI*2,
+      len: 0,
+      speed: 8 + Math.random()*6
+    }));
+  }
+  update() {
+    this.life -= 0.025;
+    this.lines.forEach(l => l.len += l.speed);
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.stroke(220, 220, 220, this.life * 0.85);
+    this.lines.forEach(l => {
+      const x1 = this.cx + Math.cos(l.angle)*20;
+      const y1 = this.cy + Math.sin(l.angle)*20;
+      const x2 = this.cx + Math.cos(l.angle)*(20+l.len);
+      const y2 = this.cy + Math.sin(l.angle)*(20+l.len);
+      p.strokeWeight(1.5 * this.life);
+      p.line(x1,y1,x2,y2);
+    });
+  }
+}
+
+class HihatAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.life = 1; this.dead = false;
+    this.dots = Array.from({length: 30}, () => ({
+      x: cx, y: cy,
+      vx: (Math.random()-0.5)*12,
+      vy: (Math.random()-0.5)*12,
+      r: Math.random()*3+1
+    }));
+  }
+  update() {
+    this.life -= 0.04;
+    this.dots.forEach(d => { d.x += d.vx; d.y += d.vy; d.vx*=0.9; d.vy*=0.9; });
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.fill(240, 210, 0, this.life * 0.9);
+    p.noStroke();
+    this.dots.forEach(d => p.ellipse(d.x, d.y, d.r*2*this.life));
+  }
+}
+
+class OpenHatAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.life = 1; this.dead = false;
+    this.r = 20;
+  }
+  update() {
+    this.r += 6; this.life -= 0.012;
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.noFill();
+    p.stroke(224, 128, 32, this.life * 0.8);
+    p.strokeWeight(2);
+    for (let i = 0; i < 3; i++) {
+      const off = i * 40;
+      p.arc(this.cx, this.cy, (this.r+off)*2, (this.r+off)*1.2, 0, Math.PI);
+    }
+  }
+}
+
+class ClapAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.life = 1; this.dead = false;
+    this.spread = 0;
+  }
+  update() {
+    this.spread += 15; this.life -= 0.03;
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.noFill();
+    p.stroke(224, 80, 16, this.life * 0.9);
+    p.strokeWeight(3 * this.life);
+    p.arc(this.cx - this.spread, this.cy, 80, 80, -Math.PI/2, Math.PI/2);
+    p.arc(this.cx + this.spread, this.cy, 80, 80,  Math.PI/2, Math.PI*1.5);
+  }
+}
+
+class TomAnim {
+  constructor(cx, cy, color, speedMul) {
+    this.cx = cx; this.cy = cy;
+    this.c = hexToRgb(color);
+    this.life = 1; this.dead = false;
+    this.r = 20; this.speed = speedMul;
+  }
+  update() {
+    this.r += this.speed; this.life -= 0.018;
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    p.noFill();
+    p.stroke(this.c.r, this.c.g, this.c.b, this.life * 0.85);
+    p.strokeWeight(4 * this.life);
+    p.ellipse(this.cx, this.cy, this.r*2, this.r*1.3);
+    p.strokeWeight(1.5 * this.life);
+    p.ellipse(this.cx, this.cy, this.r*2.5, this.r*1.7);
+  }
+}
+
+class CrashAnim {
+  constructor(cx, cy) {
+    this.cx = cx; this.cy = cy;
+    this.life = 1; this.dead = false;
+    this.r = 40;
+    this.lines = Array.from({length: 24}, (_,i) => ({
+      angle: (i/24)*Math.PI*2,
+      len: 0
+    }));
+    this.flashAlpha = 0.35;
+  }
+  update() {
+    this.r += 18; this.life -= 0.014; this.flashAlpha -= 0.04;
+    this.lines.forEach(l => l.len += 14);
+    if (this.life <= 0) this.dead = true;
+  }
+  draw(p) {
+    // screen flash
+    if (this.flashAlpha > 0) {
+      p.fill(0, 200, 200, Math.max(0, this.flashAlpha));
+      p.noStroke();
+      p.rect(0, 0, p.width, p.height);
+    }
+    // radiating lines
+    p.stroke(0, 210, 210, this.life * 0.8);
+    p.strokeWeight(1.5);
+    this.lines.forEach(l => {
+      const x1 = this.cx + Math.cos(l.angle)*this.r;
+      const y1 = this.cy + Math.sin(l.angle)*this.r;
+      const x2 = this.cx + Math.cos(l.angle)*(this.r+l.len);
+      const y2 = this.cy + Math.sin(l.angle)*(this.r+l.len);
+      p.line(x1,y1,x2,y2);
+    });
+    // outer ring
+    p.noFill();
+    p.stroke(0, 210, 210, this.life * 0.5);
+    p.strokeWeight(2);
+    p.ellipse(this.cx, this.cy, this.r*2, this.r*2);
+  }
+}
+
+function spawnAnimation(keyDef) {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  if (keyDef.note) {
+    animations.push(new RippleAnim(keyDef.color, cx, cy));
+  } else {
+    switch(keyDef.type) {
+      case 'kick':    animations.push(new KickAnim(cx, cy)); break;
+      case 'snare':   animations.push(new SnareAnim(cx, cy)); break;
+      case 'hihat':   animations.push(new HihatAnim(cx, cy)); break;
+      case 'openhat': animations.push(new OpenHatAnim(cx, cy)); break;
+      case 'clap':    animations.push(new ClapAnim(cx, cy)); break;
+      case 'lowtom':  animations.push(new TomAnim(cx, cy, '#6020a0', 8)); break;
+      case 'midtom':  animations.push(new TomAnim(cx, cy, '#9040d0', 11)); break;
+      case 'crash':   animations.push(new CrashAnim(cx, cy)); break;
+    }
+  }
+}
+
+// ─── LABEL DISPLAY ──────────────────────────────────────────────────────────
+
+let labelTimeout = null;
+function showLabel(keyDef) {
+  const el = document.getElementById('label-display');
+  const name = keyDef.note ? `${keyDef.key.toUpperCase()} — ${keyDef.label} (${keyDef.note})` : `${keyDef.key.toUpperCase()} — ${keyDef.label}`;
+  el.textContent = name;
+  el.style.color = keyDef.color;
+  el.style.opacity = '1';
+  if (labelTimeout) clearTimeout(labelTimeout);
+  labelTimeout = setTimeout(() => { el.style.opacity = '0'; }, 900);
+}
+
+// ─── KEY EVENTS ────────────────────────────────────────────────────────────
+
+const pressedKeys = new Set();
+
+document.addEventListener('keydown', async (e) => {
+  const k = e.key.toLowerCase();
+  if (pressedKeys.has(k)) return;
+  pressedKeys.add(k);
+
+  if (!audioStarted) {
+    await Tone.start();
+    initAudio();
+  }
+
+  const keyDef = ALL_KEYS[k];
+  if (keyDef) {
+    triggerSound(keyDef);
+    spawnAnimation(keyDef);
+    showLabel(keyDef);
+    flashGuideKey(k);
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  pressedKeys.delete(e.key.toLowerCase());
+});
+
+// ─── KEYBOARD GUIDE ────────────────────────────────────────────────────────
+
+function buildGuide() {
+  const guide = document.getElementById('keyboard-guide');
+
+  const melodyRow = document.createElement('div');
+  melodyRow.className = 'key-row';
+  MELODY_KEYS.forEach(k => {
+    const div = document.createElement('div');
+    div.className = 'key';
+    div.id = `guide-${k.key}`;
+    div.style.color = k.color;
+    div.style.borderColor = k.color + '55';
+    div.innerHTML = `<span class="key-label">${k.key}</span><span class="key-name">${k.label}</span>`;
+    melodyRow.appendChild(div);
+  });
+
+  const beatRow = document.createElement('div');
+  beatRow.className = 'key-row';
+  BEAT_KEYS.forEach(k => {
+    const div = document.createElement('div');
+    div.className = 'key';
+    div.id = `guide-${k.key}`;
+    div.style.color = k.color;
+    div.style.borderColor = k.color + '55';
+    div.innerHTML = `<span class="key-label">${k.key.toUpperCase()}</span><span class="key-name">${k.label}</span>`;
+    beatRow.appendChild(div);
+  });
+
+  guide.appendChild(melodyRow);
+  guide.appendChild(beatRow);
+}
+
+function flashGuideKey(k) {
+  const el = document.getElementById(`guide-${k}`);
+  if (!el) return;
+  const keyDef = ALL_KEYS[k];
+  el.style.background = keyDef.color + '33';
+  el.style.borderColor = keyDef.color;
+  el.style.transform = 'scale(1.08)';
+  setTimeout(() => {
+    el.style.background = '';
+    el.style.borderColor = keyDef.color + '55';
+    el.style.transform = '';
+  }, 150);
+}
+
+buildGuide();
+</script>
+</body>
+</html>
