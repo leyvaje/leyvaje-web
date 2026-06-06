@@ -42,12 +42,11 @@
     }
 
     /* ── canvas layers ── */
-    #bg-wrap, #fx-wrap {
+    #bg-wrap {
       position: fixed; inset: 0;
       pointer-events: none;
+      z-index: 0;
     }
-    #bg-wrap { z-index: 0; }
-    #fx-wrap  { z-index: 50; }
 
     /* ── layout ── */
     .page {
@@ -332,7 +331,6 @@
 <body>
 
 <div id="bg-wrap"></div>
-<div id="fx-wrap"></div>
 <div id="toast"></div>
 
 <div class="page">
@@ -499,9 +497,7 @@
     <button id="save-btn">save art</button>
   </div>
   <div id="kb-rows">
-    <div class="kb-row" id="row-beats"><span class="kb-row-label">beats</span></div>
-    <div class="kb-row" id="row-mel1"><span class="kb-row-label">C4–B4</span></div>
-    <div class="kb-row" id="row-mel2"><span class="kb-row-label">C5–</span></div>
+    <div class="kb-row" id="row-beats"><span class="kb-row-label">fx</span></div>
   </div>
 </div>
 
@@ -517,60 +513,30 @@ themeBtn.addEventListener('click', () => {
 
 // ── KEY MAPS ───────────────────────────────────────────────────
 const BEATS = [
-  {key:'1',label:'Kick',  color:'#c0392b',type:'kick'},
-  {key:'2',label:'Snare', color:'#888',   type:'snare'},
-  {key:'3',label:'CHH',   color:'#c8a800',type:'hihat'},
-  {key:'4',label:'OHH',   color:'#c06000',type:'openhat'},
-  {key:'5',label:'Clap',  color:'#c03020',type:'clap'},
-  {key:'6',label:'LTom',  color:'#6020a0',type:'lowtom'},
-  {key:'7',label:'MTom',  color:'#8030b0',type:'midtom'},
-  {key:'8',label:'Crash', color:'#008090',type:'crash'},
-  {key:'9',label:'Ride',  color:'#306060',type:'ride'},
-  {key:'0',label:'Perc',  color:'#a06000',type:'perc'},
-];
-const MEL1 = [
-  {key:'q',note:'C4', label:'Do',  sharp:false},
-  {key:'w',note:'C#4',label:'Do#', sharp:true },
-  {key:'e',note:'D4', label:'Re',  sharp:false},
-  {key:'r',note:'D#4',label:'Re#', sharp:true },
-  {key:'t',note:'E4', label:'Mi',  sharp:false},
-  {key:'y',note:'F4', label:'Fa',  sharp:false},
-  {key:'u',note:'F#4',label:'Fa#', sharp:true },
-  {key:'i',note:'G4', label:'Sol', sharp:false},
-  {key:'o',note:'G#4',label:'So#', sharp:true },
-  {key:'p',note:'A4', label:'La',  sharp:false},
-  {key:'[',note:'A#4',label:'La#', sharp:true },
-  {key:']',note:'B4', label:'Si',  sharp:false},
-];
-const MEL2 = [
-  {key:'a',note:'C5', label:'Do',  sharp:false},
-  {key:'s',note:'C#5',label:'Do#', sharp:true },
-  {key:'d',note:'D5', label:'Re',  sharp:false},
-  {key:'f',note:'D#5',label:'Re#', sharp:true },
-  {key:'g',note:'E5', label:'Mi',  sharp:false},
-  {key:'h',note:'F5', label:'Fa',  sharp:false},
-  {key:'j',note:'F#5',label:'Fa#', sharp:true },
-  {key:'k',note:'G5', label:'Sol', sharp:false},
-  {key:'l',note:'G#5',label:'So#', sharp:true },
-  {key:';',note:'A5', label:'La',  sharp:false},
-  {key:"'",note:'A#5',label:'La#', sharp:true },
+  {key:'1',label:'slow ½', color:'#c0392b',type:'kick',   fx:'slow'},
+  // Each key triggers a particle effect + a drum hit
+  {key:'2',label:'← drift', color:'#888',   type:'snare',   fx:'left'},
+  {key:'3',label:'size ±',  color:'#c8a800',type:'hihat',   fx:'size'},
+  {key:'4',label:'explode', color:'#c06000',type:'openhat', fx:'explode'},
+  {key:'5',label:'vortex',  color:'#c03020',type:'clap',    fx:'vortex'},
+  {key:'6',label:'freeze',  color:'#6020a0',type:'lowtom',  fx:'freeze'},
+  {key:'7',label:'fast ×3', color:'#8030b0',type:'midtom',  fx:'fast'},
+  {key:'8',label:'gravity', color:'#008090',type:'crash',   fx:'gravity'},
+  {key:'9',label:'scatter', color:'#306060',type:'ride',    fx:'scatter'},
+  {key:'0',label:'reverse', color:'#a06000',type:'perc',    fx:'reverse'},
 ];
 const ALL = {};
-BEATS.forEach(k => ALL[k.key] = {...k, kind:'beat'});
-MEL1.forEach(k  => ALL[k.key] = {...k, kind:'melody', color:'#fca311'});
-MEL2.forEach(k  => ALL[k.key] = {...k, kind:'melody', color:'#8ab4d4'});
+BEATS.forEach(k => ALL[k.key] = {...k});
 
 // ── BUILD KEYBOARD UI ─────────────────────────────────────────
 function mkKey(kd) {
   const d = document.createElement('div');
-  d.className = 'kb-key' + (kd.sharp ? ' sharp' : '');
+  d.className = 'kb-key';
   d.id = 'k-' + kd.key;
-  d.innerHTML = `<span class="k">${kd.key.toUpperCase()}</span><span class="n">${kd.label||kd.note||''}</span>`;
+  d.innerHTML = `<span class="k">${kd.key.toUpperCase()}</span><span class="n">${kd.label}</span>`;
   return d;
 }
 BEATS.forEach(k => document.getElementById('row-beats').appendChild(mkKey(k)));
-MEL1.forEach(k  => document.getElementById('row-mel1').appendChild(mkKey(k)));
-MEL2.forEach(k  => document.getElementById('row-mel2').appendChild(mkKey(k)));
 
 function litKey(k, on) {
   const el = document.getElementById('k-' + k);
@@ -579,13 +545,13 @@ function litKey(k, on) {
 
 // ── AUDIO ─────────────────────────────────────────────────────
 let audioReady = false;
-let mel, kick, snare, hh, ohh, clap, ltom, mtom, crash, ride, perc;
+let kick, snare, hh, ohh, clap, ltom, mtom, crash, ride, perc;
 
 async function initAudio() {
   if (audioReady) return;
   await Tone.start(); audioReady = true;
   const rev = new Tone.Reverb({decay:1.8, wet:0.15}).toDestination();
-  mel   = new Tone.PolySynth(Tone.Synth, {oscillator:{type:'triangle'}, envelope:{attack:0.02,decay:0.4,sustain:0.3,release:1.5}, volume:-11}).connect(rev);
+  // melody synth removed
   kick  = new Tone.MembraneSynth({pitchDecay:0.08,octaves:6,volume:-4}).toDestination();
   snare = new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:0.001,decay:0.2,sustain:0,release:0.05},volume:-13}).toDestination();
   hh    = new Tone.MetalSynth({frequency:400,envelope:{attack:0.001,decay:0.07,release:0.01},harmonicity:5.1,modulationIndex:32,resonance:4000,octaves:1.5,volume:-20}).toDestination();
@@ -600,7 +566,6 @@ async function initAudio() {
 
 function play(kd) {
   if (!audioReady) return;
-  if (kd.kind === 'melody') { mel.triggerAttackRelease(kd.note,'8n'); return; }
   switch(kd.type) {
     case 'kick':    kick.triggerAttackRelease('C1','8n'); break;
     case 'snare':   snare.triggerAttackRelease('16n'); break;
@@ -684,6 +649,16 @@ async function initWind() {
 
 initWind();
 
+// ── PARTICLE EFFECT STATE ─────────────────────────────────────
+// Written by keydown, read every frame by the p5 background sketch
+window.pFx = { type: null, until: 0, strength: 0 };
+
+const FX_DURATION = 2200; // ms each effect lasts
+
+function triggerFx(type) {
+  window.pFx = { type, until: Date.now() + FX_DURATION, strength: 1 };
+}
+
 // ── BACKGROUND — Perlin flow field + mouse gravity ─────────────
 new p5(s => {
   const PARTICLE_COUNT = 340;
@@ -703,7 +678,8 @@ new p5(s => {
       this.vx = 0; this.vy = 0;
       this.age = 0;
       this.maxAge = s.random(120, 320);
-      this.sz  = s.random(1.2, 3.2);
+      this.baseSz = s.random(1.2, 3.2);
+      this.sz  = this.baseSz;
       this.dot = s.random() > 0.15; // 85% dots, 15% short streaks
     }
 
@@ -739,9 +715,74 @@ new p5(s => {
         this.vy += mouseVY * 0.012;
       }
 
+      // ── Particle FX ─────────────────────────────────────────
+      const fx  = window.pFx;
+      const now = Date.now();
+      if (fx && fx.until > now) {
+        const t  = (fx.until - now) / FX_DURATION; // 1→0 fade
+        const cx = s.width  / 2;
+        const cy = s.height / 2;
+        switch (fx.type) {
+          case 'slow':
+            // brake to half — applied each frame so it accumulates smoothly
+            this.vx *= (0.92 - 0.04 * t);
+            this.vy *= (0.92 - 0.04 * t);
+            break;
+          case 'left':
+            this.vx -= 0.55 * t;
+            break;
+          case 'size':
+            // oscillate size with noise
+            this.sz = this.baseSz * (0.4 + s.noise(this.x*0.01, this.y*0.01, now*0.001) * 6);
+            break;
+          case 'explode': {
+            // push away from center
+            const dx = this.x - cx, dy = this.y - cy;
+            const d  = Math.sqrt(dx*dx + dy*dy) || 1;
+            this.vx += (dx/d) * 1.8 * t;
+            this.vy += (dy/d) * 1.8 * t;
+            break;
+          }
+          case 'vortex': {
+            // spiral toward mouse then orbit
+            const dx = s.mouseX - this.x, dy = s.mouseY - this.y;
+            const d  = Math.sqrt(dx*dx + dy*dy) || 1;
+            this.vx += (dx/d) * 1.2 * t;
+            this.vy += (dy/d) * 1.2 * t;
+            // tangential spin
+            this.vx += (-dy/d) * 0.6 * t;
+            this.vy += ( dx/d) * 0.6 * t;
+            break;
+          }
+          case 'freeze':
+            this.vx *= 0.80;
+            this.vy *= 0.80;
+            break;
+          case 'fast':
+            this.vx *= 1.06;
+            this.vy *= 1.06;
+            break;
+          case 'gravity':
+            this.vy += 0.25 * t;
+            break;
+          case 'scatter':
+            this.vx += (Math.random() - 0.5) * 1.5;
+            this.vy += (Math.random() - 0.5) * 1.5;
+            break;
+          case 'reverse':
+            this.vx *= -1.02;
+            this.vy *= -1.02;
+            break;
+        }
+      } else if (fx && fx.type === 'size' && fx.until <= now) {
+        // snap size back to base
+        this.sz = this.baseSz;
+      }
+
       // Cap speed
       const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-      if (spd > 2.8) { this.vx = (this.vx/spd)*2.8; this.vy = (this.vy/spd)*2.8; }
+      const cap  = fx && fx.until > now && fx.type === 'fast' ? 8 : 2.8;
+      if (spd > cap) { this.vx = (this.vx/spd)*cap; this.vy = (this.vy/spd)*cap; }
 
       this.x  += this.vx;
       this.y  += this.vy;
@@ -819,76 +860,6 @@ new p5(s => {
   };
 }, 'bg-wrap');
 
-// ── PATATAP ANIMATIONS ────────────────────────────────────────
-const anims = [];
-
-new p5(s => {
-  s.setup = () => {
-    const c = s.createCanvas(innerWidth,innerHeight);
-    c.parent('fx-wrap'); c.style('pointer-events','none');
-    s.colorMode(s.RGB,255,255,255,1);
-  };
-  s.draw = () => {
-    s.clear();
-    for(let i=anims.length-1;i>=0;i--) {
-      anims[i].update(s); anims[i].draw(s);
-      if(anims[i].dead) anims.splice(i,1);
-    }
-  };
-  s.windowResized = () => s.resizeCanvas(innerWidth,innerHeight);
-}, 'fx-wrap');
-
-const CX=()=>innerWidth/2, CY=()=>innerHeight/2;
-function rr(h){return parseInt(h.slice(1,3),16)}
-function rg(h){return parseInt(h.slice(3,5),16)}
-function rb(h){return parseInt(h.slice(5,7),16)}
-
-class Ripple {
-  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.rings=[0,1,2,3].map(i=>({r:i*22,sp:5+i*3}))}
-  update(){this.life-=0.015;this.rings.forEach(r=>r.r+=r.sp);if(this.life<=0)this.dead=true}
-  draw(s){this.rings.forEach((r,i)=>{const a=this.life*(1-i*0.22);if(a<=0)return;s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),a);s.strokeWeight(2);s.ellipse(this.cx,this.cy,r.r*2,r.r*2)})}
-}
-class Burst {
-  constructor(c,n=14,sp=11){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.lines=Array.from({length:n},(_,i)=>({angle:(i/n)*Math.PI*2+Math.random()*0.3,len:0,sp:sp+Math.random()*5}))}
-  update(){this.life-=0.022;this.lines.forEach(l=>l.len+=l.sp);if(this.life<=0)this.dead=true}
-  draw(s){s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);this.lines.forEach(l=>{s.strokeWeight(1.5*this.life);s.line(this.cx+Math.cos(l.angle)*18,this.cy+Math.sin(l.angle)*18,this.cx+Math.cos(l.angle)*(18+l.len),this.cy+Math.sin(l.angle)*(18+l.len))})}
-}
-class Scatter {
-  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.dots=Array.from({length:28},()=>({x:CX(),y:CY(),vx:(Math.random()-.5)*14,vy:(Math.random()-.5)*14,r:Math.random()*2.5+1}))}
-  update(){this.life-=0.028;this.dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;d.vx*=0.87;d.vy*=0.87});if(this.life<=0)this.dead=true}
-  draw(s){s.fill(rr(this.c),rg(this.c),rb(this.c),this.life*0.9);s.noStroke();this.dots.forEach(d=>s.ellipse(d.x,d.y,d.r*2*this.life))}
-}
-class Ring {
-  constructor(c,w=7){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=10;this.w=w}
-  update(){this.life-=0.018;this.r+=22;if(this.life<=0)this.dead=true}
-  draw(s){s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);s.strokeWeight(this.w*this.life);s.ellipse(this.cx,this.cy,this.r*2,this.r*2)}
-}
-class Flash {
-  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=30}
-  update(){this.life-=0.035;this.r+=22;if(this.life<=0)this.dead=true}
-  draw(s){s.fill(rr(this.c),rg(this.c),rb(this.c),this.life*0.18);s.noStroke();s.rect(0,0,s.width,s.height);s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.7);s.strokeWeight(1.5);[0,45,100].forEach(o=>s.ellipse(this.cx,this.cy,(this.r+o)*2,(this.r+o)*2))}
-}
-class Tri {
-  constructor(c){this.life=1;this.dead=false;this.cx=CX();this.cy=CY();this.c=c;this.r=20;this.rot=Math.random()*Math.PI}
-  update(){this.life-=0.018;this.r+=12;this.rot+=0.04;if(this.life<=0)this.dead=true}
-  draw(s){s.push();s.translate(this.cx,this.cy);s.rotate(this.rot);s.noFill();s.stroke(rr(this.c),rg(this.c),rb(this.c),this.life*0.85);s.strokeWeight(2*this.life);s.triangle(0,-this.r,this.r*0.866,this.r*0.5,-this.r*0.866,this.r*0.5);s.triangle(0,this.r,this.r*0.866,-this.r*0.5,-this.r*0.866,-this.r*0.5);s.pop()}
-}
-
-function spawnAnim(kd) {
-  if (kd.kind==='melody') { anims.push(new Ripple(kd.color)); return; }
-  switch(kd.type){
-    case 'kick':    anims.push(new Ring('#c0392b',9)); break;
-    case 'snare':   anims.push(new Burst('#aaaaaa',16,13)); break;
-    case 'hihat':   anims.push(new Scatter('#c8a800')); break;
-    case 'openhat': anims.push(new Burst('#c06000',8,8)); break;
-    case 'clap':    anims.push(new Ring('#c03020',4)); break;
-    case 'lowtom':  anims.push(new Ring('#6020a0',7)); break;
-    case 'midtom':  anims.push(new Tri('#8030b0')); break;
-    case 'crash':   anims.push(new Flash('#008090')); break;
-    case 'ride':    anims.push(new Burst('#306060',20,9)); break;
-    case 'perc':    anims.push(new Scatter('#a06000')); break;
-  }
-}
 
 // ── KEYBOARD EVENTS ───────────────────────────────────────────
 const held=new Set(); let tt;
@@ -899,9 +870,10 @@ document.addEventListener('keydown', async e => {
   await initAudio();
   const kd=ALL[k]||ALL[e.key]; if(!kd) return;
   e.preventDefault();
-  play(kd); spawnAnim(kd);
+  play(kd);
+  if (kd.fx) triggerFx(kd.fx);
   const toast=document.getElementById('toast');
-  toast.textContent = kd.kind==='melody' ? `${kd.key.toUpperCase()} · ${kd.label} (${kd.note})` : `${kd.key} · ${kd.label}`;
+  toast.textContent = `${kd.key} · ${kd.label}`;
   toast.style.color = kd.color; toast.style.opacity='1';
   clearTimeout(tt); tt=setTimeout(()=>toast.style.opacity='0',900);
   litKey(k,true);
