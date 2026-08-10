@@ -17,3 +17,4 @@ bot/package-lock.json
 
 # Static build output
 dist/
+.vercel
