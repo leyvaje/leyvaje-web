@@ -1,0 +1,9 @@
+{
+  "name": "leyvaje-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "node scripts/lint.mjs"
+  }
+}

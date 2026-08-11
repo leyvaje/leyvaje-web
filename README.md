@@ -8,6 +8,7 @@ Personal website with interactive beat maker, wind-driven particle animation, an
 /
 ├── index.html              Main website (everything in one file)
 ├── beatmaker.html          Standalone beat maker demo
+├── chillbill/              ChillBill product, support & privacy pages
 ├── CLAUDE.md               Design spec & requirements
 ├── supabase-schema.sql     Database schema (run in Supabase)
 ├── assets/
@@ -28,10 +29,26 @@ Personal website with interactive beat maker, wind-driven particle animation, an
 No build step needed — `index.html` works in the browser immediately.
 
 ```bash
-# Serve locally
-python3 -m http.server 8000
+# Validate and build the static site
+npm run lint
+npm run build
+
+# Preview the production output
+python3 -m http.server 8000 --directory dist
 # Open http://localhost:8000
 ```
+
+### ChillBill
+
+The German ChillBill pages are available at:
+
+- `/chillbill` — product page
+- `/chillbill/support` — support and bug-reporting guidance
+- `/chillbill/privacy` — privacy policy
+
+German is the canonical language for the App Store URLs. English and Spanish
+can be added later under `/chillbill/en` and `/chillbill/es` without changing
+the German URLs.
 
 ### 2. Discord Bot Setup (CMS)
 See `bot/` folder for complete setup instructions:

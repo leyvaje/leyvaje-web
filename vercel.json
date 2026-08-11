@@ -1,0 +1,42 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/chillbill/de",
+      "destination": "/chillbill",
+      "permanent": true
+    },
+    {
+      "source": "/chillbill/de/support",
+      "destination": "/chillbill/support",
+      "permanent": true
+    },
+    {
+      "source": "/chillbill/de/privacy",
+      "destination": "/chillbill/privacy",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/chillbill/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ]
+}
