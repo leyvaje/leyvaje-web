@@ -7,8 +7,11 @@ const pages = [
   'index.html',
   'beatmaker.html',
   'chillbill/index.html',
+  'chillbill/en/index.html',
   'chillbill/support/index.html',
+  'chillbill/en/support/index.html',
   'chillbill/privacy/index.html',
+  'chillbill/en/privacy/index.html',
 ];
 const issues = [];
 
@@ -20,6 +23,7 @@ for (const relativePage of pages) {
     [/<html[^>]+lang=["'][^"']+["']/i, 'missing document language'],
     [/<title>[^<]+<\/title>/i, 'missing title'],
     [/<meta[^>]+name=["']description["']/i, 'missing meta description'],
+    [/<link[^>]+rel=["']canonical["']/i, 'missing canonical URL'],
   ];
 
   for (const [pattern, message] of checks) {
@@ -50,6 +54,14 @@ for (const relativePage of pages) {
         issues.push(`${relativePage}: local reference not found: ${reference}`);
       }
     }
+  }
+}
+
+for (const crawlerFile of ['robots.txt', 'sitemap.xml']) {
+  try {
+    await access(path.join(root, crawlerFile));
+  } catch {
+    issues.push(`missing ${crawlerFile}`);
   }
 }
 

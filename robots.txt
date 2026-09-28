@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://leyvaje-web.vercel.app/sitemap.xml

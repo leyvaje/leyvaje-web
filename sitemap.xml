@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://leyvaje-web.vercel.app/</loc></url>
+  <url><loc>https://leyvaje-web.vercel.app/beatmaker</loc></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill</loc><xhtml:link rel="alternate" hreflang="de" href="https://leyvaje-web.vercel.app/chillbill"/><xhtml:link rel="alternate" hreflang="en" href="https://leyvaje-web.vercel.app/chillbill/en"/></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill/en</loc><xhtml:link rel="alternate" hreflang="de" href="https://leyvaje-web.vercel.app/chillbill"/><xhtml:link rel="alternate" hreflang="en" href="https://leyvaje-web.vercel.app/chillbill/en"/></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill/support</loc></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill/en/support</loc></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill/privacy</loc></url>
+  <url><loc>https://leyvaje-web.vercel.app/chillbill/en/privacy</loc></url>
+</urlset>
