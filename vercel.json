@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "out",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [

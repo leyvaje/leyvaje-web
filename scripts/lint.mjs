@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const pages = [
-  'index.html',
+  'public/art/index.html',
   'beatmaker.html',
   'chillbill/index.html',
   'chillbill/support/index.html',
@@ -38,6 +38,7 @@ for (const relativePage of pages) {
 
     for (const target of html.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
       const reference = target[1];
+      if (reference === '/') continue;
       if (/^(?:https?:|mailto:|tel:|#|data:)/.test(reference)) continue;
       const cleanReference = reference.split(/[?#]/)[0];
       const localPath = cleanReference.startsWith('/')
