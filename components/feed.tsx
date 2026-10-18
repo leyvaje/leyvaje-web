@@ -6,6 +6,7 @@ import { AudioPad } from '@/components/audio-pad';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const soundCloudPlayerUrl = 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/lejoe&color=%2300f0ff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=true';
 
 type Post = {
   id?: number;
@@ -29,6 +30,17 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
 }
 
+function LinkedText({ children }: { children: string }) {
+  const parts = children.split(/(https?:\/\/[^\s<]+)/g);
+
+  return <>{parts.map((part, index) => {
+    const link = safeLink(part.replace(/[),.!?]+$/, ''));
+    if (!link) return <span key={index}>{part}</span>;
+    const trailing = part.slice(link.length);
+    return <span key={index}><a className="feed-link" href={link} target="_blank" rel="noreferrer">{link}</a>{trailing}</span>;
+  })}</>;
+}
+
 function PostCard({ post }: { post: Post }) {
   const link = post.type === 'link' ? safeLink(post.content) : null;
   const media = safeLink(post.media_url);
@@ -42,8 +54,8 @@ function PostCard({ post }: { post: Post }) {
         {post.type === 'music' && media && video ? <video className="feed-video" controls preload="none" src={media}>Your browser does not support video playback.</video> : null}
         {post.type === 'music' && media && !video ? <audio className="feed-audio" controls preload="none" src={media}>Your browser does not support audio playback.</audio> : null}
         {post.type === 'link' && link ? <a className="feed-link" href={link} target="_blank" rel="noreferrer">{post.content}</a> : null}
-        {post.type !== 'link' && post.content ? <p>{post.content}</p> : null}
-        {post.type === 'link' && !link ? <p>{post.content}</p> : null}
+        {post.type !== 'link' && post.content ? <p><LinkedText>{post.content}</LinkedText></p> : null}
+        {post.type === 'link' && !link ? <p><LinkedText>{post.content ?? ''}</LinkedText></p> : null}
       </div>
       <div className="feed-card-foot"><span>{post.type === 'photo' ? 'SNAPSHOT' : post.type === 'music' ? 'AUDIO' : 'FIELD NOTES'}</span><span>LEYVAJE.COM</span></div>
     </article>
@@ -77,6 +89,8 @@ export function Feed() {
           <p className="eyebrow">MUSIC & SOUND</p>
           <h3>Tap a beat.</h3>
           <AudioPad />
+          <p className="eyebrow soundcloud-label">SOUNDCLOUD // LEJOE</p>
+          <iframe className="soundcloud-player" title="SoundCloud tracks by lejoe" src={soundCloudPlayerUrl} allow="autoplay" loading="lazy" />
         </div>
         <div className="feed-card-foot"><span>PLAY SOUNDCLOUD</span><a href="https://soundcloud.com/lejoe" target="_blank" rel="noreferrer">OPEN PROFILE ↗</a></div>
       </article>
