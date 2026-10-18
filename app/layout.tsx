@@ -6,11 +6,11 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-displ
 const jetBrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
-  title: 'Jose Enrique Leyva — Systems & Design Engineer',
-  description: 'Full-stack and mobile engineer building production apps and backend systems. Based in Attendorn, Germany.',
+  title: 'Jose Enrique Leyva — Product Builder',
+  description: 'Full-stack app developer building production apps and backend systems. Based in Frankfurt and Attendorn, Germany.',
   metadataBase: new URL('https://leyvaje.com'),
   openGraph: {
-    title: 'Jose Enrique Leyva — Systems & Design Engineer',
+    title: 'Jose Enrique Leyva — Product Builder',
     description: 'Mobile engineering, distributed systems, music, and ideas.',
     type: 'website',
   },

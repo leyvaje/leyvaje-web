@@ -78,7 +78,7 @@ export function Feed() {
           <h3>Tap a beat.</h3>
           <AudioPad />
         </div>
-        <div className="feed-card-foot"><span>PLAY SOUNDCLOUD</span><a href="https://soundcloud.com/leyvaje" target="_blank" rel="noreferrer">OPEN PROFILE ↗</a></div>
+        <div className="feed-card-foot"><span>PLAY SOUNDCLOUD</span><a href="https://soundcloud.com/lejoe" target="_blank" rel="noreferrer">OPEN PROFILE ↗</a></div>
       </article>
     </div>
   );

@@ -30,14 +30,14 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   async function copyEmail() {
-    await navigator.clipboard.writeText('jose@leyvaje.com');
+    await navigator.clipboard.writeText('appalapas@gmail.com');
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2200);
   }
 
   return (
     <button className={`button button-dark ${compact ? 'button-outline' : ''}`} type="button" onClick={copyEmail}>
-      {copied ? 'Copied · jose@leyvaje.com' : compact ? 'Copy email' : 'Copy email address'}
+      {copied ? 'Copied · appalapas@gmail.com' : compact ? 'Copy email' : 'Copy email address'}
     </button>
   );
 }

@@ -2,36 +2,14 @@ import { ContactActions, MobileNavigation } from '@/components/interactions';
 import { Feed } from '@/components/feed';
 
 const navigation = [
-  ['About', '#overview'],
-  ['Stream', '#stream'],
+  ['Hero', '#overview'],
+  ['Dynamic stream', '#stream'],
   ['Experience', '#experience'],
-  ['Capabilities', '#capabilities'],
+  ['Projects', '#projects'],
+  ['Technical matrix', '#capabilities'],
   ['Education', '#education'],
+  ['Contact', '#contact'],
 ] as const;
-
-const specialties = [
-  {
-    number: '01',
-    eyebrow: 'MOBILE ENGINEERING',
-    title: 'Native iOS & Flutter',
-    description: 'Mobile product development across Flutter, Swift, and Apple platform integrations.',
-    tags: ['Flutter', 'Swift', 'SwiftUI'],
-  },
-  {
-    number: '02',
-    eyebrow: 'FINANCIAL PRODUCTS',
-    title: 'Apps for everyday finance',
-    description: 'Experience building and maintaining consumer banking, benefits, and fitness applications.',
-    tags: ['iOS', 'Payments', 'Product'],
-  },
-  {
-    number: '03',
-    eyebrow: 'BACKEND SYSTEMS',
-    title: 'Scala & cloud services',
-    description: 'REST microservices and backend systems built with Scala, PostgreSQL, and AWS.',
-    tags: ['Scala', 'REST', 'AWS'],
-  },
-];
 
 const experience = [
   {
@@ -62,13 +40,35 @@ const experience = [
     description: 'Owned SEO, SEM, and affiliate strategy across markets.',
     tags: ['SEO', 'SEM'],
   },
+  {
+    period: '2011 — 2012',
+    company: 'TRIVAGO',
+    role: 'Online Marketing',
+    description: 'Online marketing work at trivago.',
+    tags: ['Online Marketing'],
+  },
+  {
+    period: '2007 — 2009',
+    company: 'MEXICO',
+    role: 'Branding Manager',
+    description: 'Brand strategy and management in Mexico.',
+    tags: ['Branding', 'Marketing'],
+  },
 ];
 
 const matrix = [
   { index: '01 // MOBILE', title: 'Mobile & UI', rows: [['Flutter · Dart', 'App'], ['Swift · SwiftUI', 'iOS'], ['RxSwift · Combine', 'Reactive'], ['Apple Pay · Watch', 'APIs']] },
   { index: '02 // BACKEND', title: 'Backend & data', rows: [['Scala · Python', 'Code'], ['REST APIs', 'Web'], ['PostgreSQL', 'Data']] },
   { index: '03 // DELIVERY', title: 'DevOps & tooling', rows: [['Git · CircleCI', 'CI/CD'], ['Fastlane · Firebase', 'Mobile'], ['AWS', 'Cloud']] },
-  { index: '04 // LANGUAGES', title: 'Languages', rows: [['Spanish', 'Native'], ['English', 'C2'], ['German', 'C1'], ['Swedish', 'A1']] },
+];
+
+const projects = [
+  { name: 'ChillBill', href: '/chillbill', detail: 'Personal finance app', status: 'LIVE' },
+  { name: 'Two in Flow', href: '/two-in-flow/', detail: 'A shared space for two', status: 'LIVE' },
+  { name: 'PlaySpotWhee', href: 'https://playspot-whee.vercel.app', detail: 'Find a place to play', status: 'LIVE' },
+  { name: 'A mi mesa', detail: 'Coming soon', status: 'SOON' },
+  { name: 'Mimur', detail: 'Coming soon', status: 'SOON' },
+  { name: 'NotedTS', href: 'https://github.com/leyvaje/NotedTS', detail: 'TypeScript notes', status: 'LIVE' },
 ];
 
 const socialLinks = [
@@ -76,7 +76,7 @@ const socialLinks = [
   ['LinkedIn', 'https://linkedin.com/in/-leyva'],
   ['Twitter', 'https://twitter.com/leyvaje'],
   ['Instagram', 'https://instagram.com/leyvajex'],
-  ['SoundCloud', 'https://soundcloud.com/leyvaje'],
+  ['SoundCloud', 'https://soundcloud.com/lejoe'],
 ] as const;
 
 function SectionHeading({ eyebrow, title, note, id }: { eyebrow: string; title: string; note?: string; id?: string }) {
@@ -105,7 +105,7 @@ export default function Home() {
             {navigation.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
           </nav>
           <div className="topbar-actions">
-            <span className="location-chip"><span className="status-dot" /> Attendorn, Germany</span>
+            <span className="location-chip" aria-label="Beatmaker keyboard shortcuts"><span className="status-dot" /> A KICK · S SNARE · D HI-HAT</span>
             <a className="button button-dark header-contact" href="#contact">Get in touch</a>
             <MobileNavigation items={navigation} />
           </div>
@@ -117,33 +117,20 @@ export default function Home() {
           <div className="frame hero-frame">
             <div className="titlebar">
               <span><i className="status-dot" /> MOBILE & FULL-STACK ENGINEER</span>
-              <span>ATTENDORN / GERMANY <b>·</b> 10+ YEARS IN SOFTWARE</span>
+              <span>FRANKFURT & ATTENDORN, GERMANY <b>·</b> 10+ YEARS IN SOFTWARE</span>
             </div>
             <div className="hero-content">
-              <p className="eyebrow hero-label">INDEPENDENT ENGINEERING · PRODUCT MINDED</p>
+              <p className="eyebrow hero-label">PRODUCT BUILDER · PRODUCT MINDED</p>
               <h1>Jose Enrique<br /><span>Leyva</span></h1>
-              <p className="hero-subtitle">Building mobile products and the systems behind them.</p>
+              <p className="hero-subtitle">Full-stack app developer building mobile products and the systems behind them.</p>
               <div className="hero-bottom">
-                <p className="hero-copy">Full-stack and mobile developer with 10+ years building production-grade apps — iOS, Flutter, and backend systems. Based in Attendorn, Germany.</p>
+                <p className="hero-copy">Full-stack app developer with 10+ years building production-grade apps — iOS, Flutter, and backend systems. Based in Frankfurt and Attendorn, Germany.</p>
                 <div className="hero-actions">
                   <ContactActions />
                   <a className="button button-soft" href="#stream">Explore the stream ↓</a>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="section-wrap specialties-section" aria-labelledby="specialties-title">
-          <div className="section-ruler"><span id="specialties-title">CORE SPECIALTIES</span><span>EXPERIENCE ACROSS THE STACK</span></div>
-          <div className="specialties-grid">
-            {specialties.map((item) => (
-              <article className="frame specialty-card" key={item.number}>
-                <div className="titlebar"><span>{item.number} · {item.eyebrow}</span><i className="status-dot" /></div>
-                <div className="card-body"><h3>{item.title}</h3><p>{item.description}</p></div>
-                <TagList tags={item.tags} />
-              </article>
-            ))}
           </div>
         </section>
 
@@ -164,6 +151,16 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="section-wrap projects-section" aria-labelledby="projects-title">
+          <SectionHeading id="projects" eyebrow="SELECTED WORK // APPS & TOOLS" title="Projects" note="Things I have built, with more in the workshop." />
+          <div className="projects-grid">
+            {projects.map((project) => <article className="frame project-card" key={project.name}>
+              <div className="titlebar"><span><i className="status-dot" /> {project.status}</span><span>PROJECT</span></div>
+              <div className="project-card-body"><h3>{project.name}</h3><p>{project.detail}</p>{project.href ? <a className="text-link" href={project.href} target={project.href.startsWith('http') ? '_blank' : undefined} rel={project.href.startsWith('http') ? 'noreferrer' : undefined}>Explore project ↗</a> : <span className="project-coming-soon">Coming soon</span>}</div>
+            </article>)}
+          </div>
+        </section>
+
         <section className="section-wrap capabilities-section" aria-labelledby="capabilities-title">
           <SectionHeading id="capabilities" eyebrow="CORE COMPETENCE" title="Technical matrix" note="Tools and technologies used across mobile, backend, and delivery." />
           <div className="matrix-grid">
@@ -179,20 +176,22 @@ export default function Home() {
         <section className="section-wrap education-section" aria-labelledby="education-title">
           <SectionHeading id="education" eyebrow="ACADEMIC BACKGROUND" title="Education" />
           <div className="education-grid">
-            <article className="frame education-card"><div className="titlebar"><span>M.SC. // ECONOMICS</span><span>SWEDEN</span></div><div className="education-body"><h3>Jönköping International Business School</h3></div></article>
-            <article className="frame education-card"><div className="titlebar"><span>B.A. // MARKETING</span><span>MEXICO</span></div><div className="education-body"><h3>Universidad Anáhuac Mayab</h3></div></article>
+            <article className="frame education-card"><div className="titlebar"><span>M.SC. // ECONOMICS</span><span>SWEDEN</span></div><div className="education-body"><div className="education-heading"><span className="flag flag-sweden" role="img" aria-label="Monochrome Swedish flag" /><h3>Jönköping International Business School</h3></div></div></article>
+            <article className="frame education-card"><div className="titlebar"><span>B.A. // MARKETING</span><span>MEXICO</span></div><div className="education-body"><div className="education-heading"><span className="flag flag-mexico" role="img" aria-label="Monochrome Mexican flag" /><h3>Universidad Anáhuac Mayab</h3></div></div></article>
           </div>
+          <div className="language-strip"><span className="eyebrow">LANGUAGES</span><span>Spanish · Native</span><span>English · C2</span><span>German · C1</span><span>Swedish · A1</span></div>
         </section>
 
         <section className="contact-wrap" id="contact">
           <div className="frame contact-card">
-            <div className="titlebar"><span><i className="status-dot" /> LEYVAJE // DIRECT COMMUNICATION</span><span>ATTENDORN</span></div>
-            <div className="contact-content"><p className="eyebrow">HAVE A PROJECT IN MIND?</p><h2>Let’s build something useful.</h2><p>Based in Attendorn, Germany. Reach out about engineering, mobile apps, or product work.</p><div className="contact-actions"><a className="button button-dark" href="mailto:jose@leyvaje.com">Send email ↗</a><ContactActions compact /></div><div className="project-links"><span className="eyebrow">MORE FROM THE SITE</span><a href="/art/">Interactive art ↗</a><a href="/beatmaker">Beat maker ↗</a><a href="/chillbill">ChillBill ↗</a><a href="/two-in-flow/">Two in Flow ↗</a><a href="/assets/documents/jose_leyva_cv_2026.pdf">Download CV ↗</a></div><div className="social-links">{socialLinks.map(([label, href]) => <a key={label} href={href} target="_blank" rel="noreferrer">{label} ↗</a>)}</div></div>
+            <div className="titlebar"><span><i className="status-dot" /> LEYVAJE // DIRECT COMMUNICATION</span><span>FRANKFURT & ATTENDORN</span></div>
+            <div className="contact-content"><p className="eyebrow">HAVE A PROJECT IN MIND?</p><h2>Let’s build something useful.</h2><p>Based in Frankfurt and Attendorn, Germany. Reach out about engineering, mobile apps, or product work.</p><div className="contact-actions"><a className="button button-dark" href="mailto:appalapas@gmail.com">Send email ↗</a><ContactActions compact /></div><div className="project-links"><span className="eyebrow">MORE FROM THE SITE</span><a href="/assets/documents/jose_leyva_cv_2026.pdf">Download CV ↗</a></div><div className="social-links">{socialLinks.map(([label, href]) => <a key={label} href={href} target="_blank" rel="noreferrer">{label} ↗</a>)}</div></div>
           </div>
         </section>
       </main>
 
-      <footer className="footer"><span>© 2026 Jose Enrique Leyva N. · Attendorn, Germany</span><span>SYSTEMS, MOBILE & PRODUCT ENGINEERING</span></footer>
+      <section className="section-wrap mentions-section" aria-labelledby="mentions-title"><SectionHeading id="mentions" eyebrow="CREDITS // INSPIRATION" title="Special mentions" /><div className="mentions-grid"><a className="frame mention-card" href="https://wed.mx/en/" target="_blank" rel="noreferrer"><span className="eyebrow">PARTNER DESIGN STUDIO</span><strong>WED ↗</strong><span>Partner design studio in Mérida, Mexico</span></a><a className="frame mention-card" href="https://patatap.com" target="_blank" rel="noreferrer"><span className="eyebrow">INSPIRATION</span><strong>Patatap ↗</strong><span>Inspiring beat-making web experience</span></a></div></section>
+      <footer className="footer"><span>© 2026 Jose Enrique Leyva N. · Frankfurt & Attendorn, Germany</span><span>SYSTEMS, MOBILE & PRODUCT BUILDING</span></footer>
     </>
   );
 }
