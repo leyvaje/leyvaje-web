@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NotedTS: AI Meeting Notes. Private conversation notes, made on your device with offline multilingual speech-to-text transcription and source-language summaries.">
+    <meta name="theme-color" content="#FEF9F2">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="NotedTS: AI Meeting Notes — Private conversation notes, made on your device">
+    <meta property="og:description" content="Record conversations, transcribe locally with Whisper, and generate structured summaries and action items on your device with Qwen3. No cloud AI, no accounts, no tracking.">
+    <meta property="og:image" content="https://leyvaje-web.vercel.app/notedts/assets/app-icon.png">
+    <meta property="og:image:alt" content="NotedTS app icon">
+    <link rel="canonical" href="https://leyvaje-web.vercel.app/notedts">
+    <link rel="icon" href="/notedts/assets/app-icon.png" type="image/png">
+    <link rel="stylesheet" href="/notedts/assets/notedts.css">
+    <title>NotedTS: AI Meeting Notes — Private conversation notes, made on your device</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/notedts" aria-label="NotedTS home">
+          <img src="/notedts/assets/app-icon.png" alt="NotedTS app icon" width="40" height="40">
+          NotedTS
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/notedts" aria-current="page">Overview</a>
+          <a href="/notedts/support">Support</a>
+          <a href="/notedts/privacy">Privacy Policy</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">Private · On-Device</p>
+            <h1>Private conversation notes, made on your device.</h1>
+            <p class="lead">Record a conversation, review the multilingual transcript, and keep a concise source-language summary, key points, and action items for later—processed and stored locally on your iPhone or Android device.</p>
+            <div class="actions">
+              <a class="button" href="#how-it-works">How it works</a>
+              <a class="button secondary" href="/notedts/privacy">Read Privacy Policy</a>
+            </div>
+            <p class="privacy-note">
+              <span class="privacy-dot" aria-hidden="true"></span>
+              <span>No account required. No cloud AI uploads, no subscriptions, no ads, and no analytics or telemetry.</span>
+            </p>
+          </div>
+
+          <div class="app-preview" aria-label="NotedTS conversation summary preview">
+            <div class="preview-header">
+              <span class="preview-wordmark">NotedTS</span>
+              <span class="preview-badge">On-Device AI</span>
+            </div>
+            <div class="preview-card">
+              <p class="preview-meta">November 22, 2026 · 18m 40s · Processed locally</p>
+              <p class="preview-title">Product Release &amp; Q4 Planning</p>
+              <p class="preview-section-label">Brief Summary</p>
+              <p class="preview-text">Reviewed iOS and Android release verification milestones, on-device model checksums, and local storage controls.</p>
+              <p class="preview-section-label">Key Points</p>
+              <ul class="preview-list">
+                <li>Whisper base model handles multilingual speech-to-text offline after a one-time download.</li>
+                <li>Qwen3 generates structured summaries and action items in the conversation's original language.</li>
+              </ul>
+              <p class="preview-section-label">Action Items</p>
+              <ul class="preview-list">
+                <li>Complete physical-device validation before store submission.</li>
+                <li>Delete raw WAV audio after reviewing transcript to reclaim storage.</li>
+              </ul>
+            </div>
+            <div class="preview-card preview-card-blue">
+              <div class="preview-footer-row">
+                <span>Audio file deleted · Transcript &amp; summary kept</span>
+                <span>0 B audio on disk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section surface" id="features">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Key features</p>
+            <h2>Built for privacy-first conversation notes.</h2>
+            <p>Everything runs locally on your device after a one-time model download in Settings.</p>
+          </div>
+          <div class="grid-3">
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">1</span>
+              <h3>Multilingual on-device transcription</h3>
+              <p>Speech-to-text runs locally using OpenAI Whisper (<code>ggml-base.bin</code> via <code>whisper.cpp</code>), transcribing conversations in their original language without sending audio to external servers.</p>
+            </article>
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">2</span>
+              <h3>Source-language summaries &amp; action items</h3>
+              <p>On-device summarization powered by Qwen3 (<code>Qwen3-0.6B-Q8_0.gguf</code> via <code>llama.cpp</code>) produces a brief summary, key points, and source-supported action items in the same language as your transcript.</p>
+            </article>
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">3</span>
+              <h3>Delete audio, keep your notes</h3>
+              <p>Once a recording is transcribed, you can delete its 16 kHz mono WAV audio file individually or in bulk from Storage while keeping the transcript and summary on your device.</p>
+            </article>
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">4</span>
+              <h3>Verified one-time model downloads</h3>
+              <p>Download the speech-to-text (~141 MB) and summary (~610 MB) models once over HTTPS from Hugging Face (Wi-Fi by default, or mobile data with your approval), verified with SHA-256 checksums before use.</p>
+            </article>
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">5</span>
+              <h3>Recording safety limits</h3>
+              <p>Recordings show a soft inline notice at 60 minutes (<em>"Long recording · Auto-saves at 2 hours"</em>) and automatically stop and save at 2 hours so long sessions are never lost.</p>
+            </article>
+            <article class="card light">
+              <span class="card-icon" aria-hidden="true">6</span>
+              <h3>No cloud, accounts, or telemetry</h3>
+              <p>NotedTS requires no sign-in and includes no analytics SDKs, no advertising, and no cloud sync. Conversations stay local to your installation until you delete them.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="how-it-works">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">How it works</p>
+            <h2>From spoken conversation to structured notes.</h2>
+            <p>Always inform everyone in the conversation and obtain any consent required by local law before you start recording.</p>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <span class="card-number" aria-hidden="true">01</span>
+              <h3>Download models once</h3>
+              <p>Open <strong>Settings → On-device models</strong> to download the multilingual speech-to-text model and the conversation summary model over Wi-Fi (or mobile data when you approve).</p>
+            </article>
+            <article class="card">
+              <span class="card-number" aria-hidden="true">02</span>
+              <h3>Record with consent</h3>
+              <p>Tap Record to capture 16 kHz mono WAV audio locally. On Android, a microphone foreground service notification remains visible while recording.</p>
+            </article>
+            <article class="card">
+              <span class="card-number" aria-hidden="true">03</span>
+              <h3>Review, share &amp; manage storage</h3>
+              <p>Keep the app open while foreground transcription and summarization complete. Read or share your transcript and summary, and delete the raw audio file whenever you want to free space.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="cta-panel">
+            <div>
+              <h2>Questions or feedback about NotedTS?</h2>
+              <p>Visit the Support page for troubleshooting tips or reach out directly by email.</p>
+            </div>
+            <div class="actions">
+              <a class="button" href="/notedts/support">Open Support &amp; FAQ</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>© 2026 Appalapa · Jose Leyva · Bundle / Package ID: <code>com.appalapa.notedts</code></p>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="/notedts/privacy">Privacy Policy</a>
+          <a href="/notedts/support">Support</a>
+          <a href="mailto:appalapas@gmail.com">appalapas@gmail.com</a>
+          <a href="/">leyvaje</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

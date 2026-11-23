@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Support, FAQ, and troubleshooting for NotedTS: AI Meeting Notes (com.appalapa.notedts). Get help with model downloads, foreground processing, recording limits, and audio storage.">
+    <meta name="theme-color" content="#FEF9F2">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Support — NotedTS: AI Meeting Notes">
+    <meta property="og:description" content="Answers to common questions about on-device models, foreground processing, retry controls, recording limits, and storage in NotedTS.">
+    <link rel="canonical" href="https://leyvaje-web.vercel.app/notedts/support">
+    <link rel="icon" href="/notedts/assets/app-icon.png" type="image/png">
+    <link rel="stylesheet" href="/notedts/assets/notedts.css">
+    <title>Support — NotedTS: AI Meeting Notes</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/notedts" aria-label="NotedTS home">
+          <img src="/notedts/assets/app-icon.png" alt="NotedTS app icon" width="40" height="40">
+          NotedTS
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/notedts">Overview</a>
+          <a href="/notedts/support" aria-current="page">Support</a>
+          <a href="/notedts/privacy">Privacy Policy</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="page-hero">
+        <div class="container">
+          <p class="eyebrow">NotedTS Support</p>
+          <h1>How can we help?</h1>
+          <p class="lead">Find quick answers for downloading on-device AI models, managing foreground transcription and summaries, reclaiming audio storage, and contacting support.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container content-layout">
+          <div>
+            <div class="section-heading">
+              <p class="eyebrow">FAQ &amp; Troubleshooting</p>
+              <h2>Common questions.</h2>
+              <p>Everything in NotedTS runs locally on your device. Here is how to get the best experience on iOS and Android.</p>
+            </div>
+
+            <div class="faq-list">
+              <details open>
+                <summary>How do I download the speech-to-text and summary models (Wi-Fi vs. mobile data)?</summary>
+                <p>Open <strong>Settings → On-device models</strong> inside NotedTS:</p>
+                <ul>
+                  <li><strong>Multilingual speech-to-text model</strong> (Whisper <code>ggml-base.bin</code>, ~141 MB)</li>
+                  <li><strong>Conversation summary model</strong> (Qwen3 <code>Qwen3-0.6B-Q8_0.gguf</code>, ~610 MB)</li>
+                </ul>
+                <p>Tap <strong>Download</strong> next to each model. Downloads use Wi-Fi by default and pause automatically if Wi-Fi disconnects. If Wi-Fi is unavailable, NotedTS asks <em>"Use mobile data?"</em> before using cellular data. If a download is interrupted, tap <strong>Resume</strong> to continue from where it stopped. Each file is verified with a SHA-256 checksum before activation.</p>
+              </details>
+
+              <details>
+                <summary>Why does processing run in the foreground and keep the screen awake?</summary>
+                <p>On-device speech-to-text (Whisper) and LLM summarization (Qwen3) are compute-intensive native tasks. On iOS and Android, mobile operating systems suspend or terminate heavy background CPU/GPU work to protect battery life.</p>
+                <p>To prevent your transcription or summary from being cut off by the OS, NotedTS processes recordings while the app is open in the foreground and temporarily keeps your screen awake (wakelock) until the active job finishes. Once processing completes, normal screen auto-lock is restored immediately.</p>
+              </details>
+
+              <details>
+                <summary>How do I pause, resume, or retry failed summaries ("Process again" / "Retry all")?</summary>
+                <ul>
+                  <li><strong>Automatic pause &amp; resume:</strong> If you start a new recording while a note is being processed, or if you switch away from the app, NotedTS safely pauses the processing queue and resumes when you finish recording or return to the app.</li>
+                  <li><strong>Retry a single conversation:</strong> If transcription or summarization fails or is interrupted (for example, if a model was not yet installed), tap <strong>Process again</strong> on that conversation card in your notes list.</li>
+                  <li><strong>Retry all failed summaries:</strong> When one or more transcribed notes have a failed summary, a banner appears at the top of the home screen showing how many summaries failed. Tap <strong>Retry all</strong> to queue and re-run summarization for all of them in order.</li>
+                </ul>
+              </details>
+
+              <details>
+                <summary>What happens during long recordings (60-minute notice &amp; 2-hour automatic safety stop)?</summary>
+                <p>To protect device storage, memory, and battery while ensuring long conversations are never lost:</p>
+                <ul>
+                  <li><strong>At 60 minutes:</strong> A soft inline notice appears in the recording panel (<em>"Long recording · Auto-saves at 2 hours"</em>) while recording continues uninterrupted.</li>
+                  <li><strong>At 2 hours:</strong> The recording stops automatically, saves the audio file to your device, and displays a confirmation banner (<em>"Recording stopped automatically at 2 hours for safety and was saved."</em>). You can immediately start a new recording if your meeting continues.</li>
+                </ul>
+              </details>
+
+              <details>
+                <summary>How do I delete audio files while keeping my transcripts and summaries?</summary>
+                <p>Raw 16 kHz mono WAV audio files take up the most disk space, whereas text transcripts and summaries use very little storage. Once a recording has been transcribed, you can delete its audio file in two ways:</p>
+                <ul>
+                  <li><strong>Single conversation:</strong> Open the conversation detail screen and tap the delete audio action on the audio player card, or open <strong>Settings → Recording storage</strong> and tap the trash icon next to that recording.</li>
+                  <li><strong>All transcribed recordings at once:</strong> Open <strong>Settings → Recording storage</strong> and tap <strong>Delete all</strong> in the top bar. Any recording that is still awaiting transcription (marked <em>PENDING</em>) is kept safe until its transcript is complete.</li>
+                </ul>
+              </details>
+
+              <details>
+                <summary>Can I delete or replace the downloaded AI models to free up space?</summary>
+                <p>Yes. Go to <strong>Settings → On-device models</strong>, tap the menu button next to an installed model, and choose <strong>Delete model</strong> (or <strong>Replace model</strong> to re-download and re-verify it). Deleting a model does not delete your existing transcripts or summaries.</p>
+              </details>
+            </div>
+
+            <div class="section-heading" style="margin-top: 64px">
+              <p class="eyebrow">Reporting a bug</p>
+              <h2>What to include in a bug report.</h2>
+              <p>Because NotedTS collects no telemetry or crash logs automatically, sharing a few technical details helps us reproduce and fix issues quickly. <strong>Never send private audio recordings or confidential conversation transcripts.</strong></p>
+            </div>
+            <pre class="report-template" aria-label="Bug report email template">App: NotedTS (com.appalapa.notedts)
+App version / build: (e.g. 1.0.0)
+Device model: (e.g. iPhone 16 Pro / Samsung Galaxy S23)
+OS version: (e.g. iOS 26.6 / Android 15)
+Models installed: (Whisper speech-to-text / Qwen3 summary)
+
+What happened?
+
+Steps to reproduce:
+1.
+2.
+3.
+
+Expected behavior:</pre>
+          </div>
+
+          <aside class="sidebar-card" aria-labelledby="contact-title">
+            <h2 id="contact-title">Contact Support</h2>
+            <p>Have a question, bug report, or feedback about NotedTS? Email us directly:</p>
+            <p><a href="mailto:appalapas@gmail.com?subject=NotedTS%20Support">appalapas@gmail.com</a></p>
+            <p><strong>Response expectations:</strong> We read every message and aim to respond within 2–3 business days.</p>
+            <p><strong>Publisher:</strong><br>Appalapa (Jose Leyva)<br>Kölner Straße 41<br>57439 Attendorn, Germany</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>© 2026 Appalapa · Jose Leyva · NotedTS Support (<code>com.appalapa.notedts</code>)</p>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="/notedts">Overview</a>
+          <a href="/notedts/privacy">Privacy Policy</a>
+          <a href="mailto:appalapas@gmail.com">appalapas@gmail.com</a>
+          <a href="/">leyvaje</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

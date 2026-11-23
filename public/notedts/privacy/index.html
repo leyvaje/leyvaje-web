@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for NotedTS: AI Meeting Notes (com.appalapa.notedts). Learn how audio recordings, transcripts, summaries, model downloads, and backups are handled locally on your device.">
+    <meta name="theme-color" content="#FEF9F2">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Privacy Policy — NotedTS: AI Meeting Notes">
+    <meta property="og:description" content="Audio recordings, transcripts, and summaries are processed and stored locally on your device. No accounts, no cloud AI, no ads, and no telemetry.">
+    <link rel="canonical" href="https://leyvaje-web.vercel.app/notedts/privacy">
+    <link rel="icon" href="/notedts/assets/app-icon.png" type="image/png">
+    <link rel="stylesheet" href="/notedts/assets/notedts.css">
+    <title>Privacy Policy — NotedTS: AI Meeting Notes</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/notedts" aria-label="NotedTS home">
+          <img src="/notedts/assets/app-icon.png" alt="NotedTS app icon" width="40" height="40">
+          NotedTS
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/notedts">Overview</a>
+          <a href="/notedts/support">Support</a>
+          <a href="/notedts/privacy" aria-current="page">Privacy Policy</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="page-hero">
+        <div class="container">
+          <p class="eyebrow">Privacy Policy</p>
+          <h1>Your conversations stay on your device.</h1>
+          <p class="lead">NotedTS (App Store title: <em>NotedTS: AI Meeting Notes</em>, Bundle / Package ID: <code>com.appalapa.notedts</code>) is built to record, transcribe, and summarize conversations locally on your device without sending your audio or notes to developer servers or third-party AI APIs.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container content-layout">
+          <article class="legal-content">
+            <p class="legal-meta"><strong>Effective date:</strong> November 22, 2026 · <strong>Applies to:</strong> NotedTS for iOS and Android (<code>com.appalapa.notedts</code>) and the NotedTS public web pages</p>
+
+            <div class="consent-banner" role="note" aria-label="Participant consent reminder">
+              <h3>Participant consent before recording</h3>
+              <p>Always inform everyone in the conversation and obtain any consent required by local law before you start recording.</p>
+            </div>
+
+            <h2>1. Publisher &amp; Data Controller</h2>
+            <p>The publisher and controller responsible for NotedTS and these public web pages is:</p>
+            <p>
+              <strong>Appalapa (Jose Leyva)</strong><br>
+              Kölner Straße 41<br>
+              57439 Attendorn<br>
+              Germany
+            </p>
+            <p>Privacy &amp; support contact email: <a href="mailto:appalapas@gmail.com">appalapas@gmail.com</a></p>
+
+            <h2>2. Data We Do NOT Collect</h2>
+            <p>NotedTS is designed so that we never receive or access your conversations:</p>
+            <ul>
+              <li><strong>No account or sign-in:</strong> You do not create an account or provide your name, email address, or phone number to use the app.</li>
+              <li><strong>No cloud AI processing:</strong> Your audio recordings, transcripts, and summaries are never uploaded to developer servers or external cloud AI APIs.</li>
+              <li><strong>No analytics, ads, tracking, or telemetry:</strong> The app and these web pages contain zero third-party analytics SDKs, advertising identifiers, tracking pixels, cookies, or usage telemetry.</li>
+            </ul>
+
+            <h2>3. On-Device Processing &amp; Local Storage</h2>
+            <p>When you record and process a conversation in NotedTS:</p>
+            <ul>
+              <li><strong>Audio recordings:</strong> Captured as 16 kHz mono WAV files and saved inside the app's local Documents directory on your device.</li>
+              <li><strong>Speech-to-text transcription:</strong> Performed locally on your device using OpenAI Whisper (<code>ggml-base.bin</code> running on <code>whisper.cpp</code>).</li>
+              <li><strong>Conversation summaries:</strong> Generated locally on your device in the transcript's source language using Qwen3 (<code>Qwen3-0.6B-Q8_0.gguf</code> running on <code>llama.cpp</code>), producing a brief summary, key points, and action items.</li>
+              <li><strong>Local metadata:</strong> Conversation titles, timestamps, processing state, transcripts, summaries, and app preferences are stored locally in your device's application storage. Conversations are local to each installation; there is no cross-device cloud sync.</li>
+            </ul>
+
+            <h2>4. Network Requests &amp; One-Time Model Downloads</h2>
+            <p>On mobile devices (iOS and Android), NotedTS connects to the network only when you choose to download or replace the on-device AI models in <strong>Settings → On-device models</strong>:</p>
+            <ul>
+              <li><strong>Multilingual speech-to-text model:</strong> <code>ggml-base.bin</code> (~141 MB) downloaded over HTTPS from Hugging Face (<code>huggingface.co</code>).</li>
+              <li><strong>Conversation summary model:</strong> <code>Qwen3-0.6B-Q8_0.gguf</code> (~610 MB) downloaded over HTTPS from Hugging Face (<code>huggingface.co</code>).</li>
+              <li><strong>Network controls &amp; integrity verification:</strong> Model downloads use Wi-Fi by default and only use mobile data when you explicitly approve the prompt. Every downloaded model file is verified locally against its pinned SHA-256 cryptographic checksum before use.</li>
+              <li><strong>No conversation data sent:</strong> Only standard HTTPS file-download requests (such as your device's IP address and user agent handled by Hugging Face to deliver the model file) occur during download. No audio recordings, transcripts, summaries, or personal identifiers are ever transmitted.</li>
+            </ul>
+
+            <h2>5. Permissions &amp; Recording Consent Responsibility</h2>
+            <ul>
+              <li><strong>Microphone permission:</strong> NotedTS requests microphone access solely to record audio when you explicitly start a recording. You can revoke microphone permission at any time in your iOS or Android system settings.</li>
+              <li><strong>Active recording indicators &amp; limits:</strong> While recording on Android, NotedTS runs a microphone foreground service with a persistent notification so you always know recording is active. Recordings display a soft inline notice at 60 minutes and automatically stop and save at 2 hours for safety.</li>
+              <li><strong>Your legal responsibility:</strong> Recording laws vary by jurisdiction. You are solely responsible for informing all participants in a conversation and obtaining any consent required by applicable law before starting a recording.</li>
+            </ul>
+
+            <h2>6. Device Backups</h2>
+            <ul>
+              <li><strong>iOS:</strong> Downloaded AI model files stored in <code>Application Support/models</code> are marked to be excluded from iCloud Backup so large model binaries do not consume your iCloud storage. Your recordings, transcripts, and summaries remain in local app storage and may be included in your encrypted device or iCloud backups depending on your personal iOS backup settings.</li>
+              <li><strong>Android:</strong> Automatic app backup is disabled in the app manifest (<code>android:allowBackup="false"</code>), preventing your private recordings, transcripts, and summaries from being automatically uploaded to cloud app-backup services.</li>
+            </ul>
+
+            <h2>7. Data Retention &amp; How You Delete Data</h2>
+            <p>Your recordings, transcripts, and summaries remain on your device until you delete them. Because all data stays on your device, you have full, immediate control over deletion:</p>
+            <ul>
+              <li><strong>Delete audio only (keep transcript &amp; summary):</strong> Once a conversation is transcribed, you can delete its WAV audio file from the conversation detail screen or delete audio files individually or all at once in <strong>Settings → Recording storage</strong> while keeping the text transcript and summary.</li>
+              <li><strong>Delete an entire conversation:</strong> You can delete any conversation in the app, which permanently removes its audio file, transcript, and summary from local storage.</li>
+              <li><strong>Delete downloaded AI models:</strong> In <strong>Settings → On-device models</strong>, you can open the model actions menu and select <strong>Delete model</strong> at any time to remove the downloaded model files from your device.</li>
+              <li><strong>Uninstalling the app:</strong> Uninstalling NotedTS removes its local app storage directory from your device.</li>
+            </ul>
+
+            <h2>8. Sharing &amp; Support Emails</h2>
+            <ul>
+              <li><strong>Voluntary sharing:</strong> If you use the Share button on a transcript or summary, the text is passed to your operating system's native share sheet so you can send it to an app or recipient of your choice.</li>
+              <li><strong>Support emails:</strong> If you contact us at <a href="mailto:appalapas@gmail.com">appalapas@gmail.com</a>, we receive your email address and any information you choose to include in your message solely to reply to your inquiry (Art. 6(1)(f) GDPR legitimate interest in handling support requests). Please do not include confidential recordings or sensitive transcripts in support emails.</li>
+            </ul>
+
+            <h2>9. Website Hosting</h2>
+            <p>These static information pages are hosted via Vercel. When you visit a web page, standard technical connection data (such as IP address, timestamp, requested URL, and browser user agent) may be processed in server logs to deliver the page securely and reliably (Art. 6(1)(f) GDPR). These pages set no cookies, run no analytics scripts, and load no third-party fonts or trackers.</p>
+
+            <h2>10. Children's Privacy</h2>
+            <p>NotedTS does not collect personal information from anyone, including children. Because all recording and processing happen locally on the device without user accounts or data collection, we do not knowingly collect or store personal data from children under 13 (or the applicable age of consent in your country).</p>
+
+            <h2>11. Your Privacy Rights &amp; Policy Updates</h2>
+            <p>Because NotedTS does not collect or store your app data on developer servers, we cannot view, export, or remotely delete your conversations—you exercise those rights directly inside the app on your device. For any personal data processed when you email support, you have the right to request access, rectification, erasure, or restriction under applicable data protection law (including the GDPR), and the right to lodge a complaint with a supervisory authority.</p>
+            <p>If we update this Privacy Policy to reflect app changes or legal requirements, we will publish the revised policy on this page and update the effective date at the top.</p>
+          </article>
+
+          <aside class="sidebar-card" aria-labelledby="privacy-at-a-glance">
+            <h2 id="privacy-at-a-glance">At a glance</h2>
+            <ul>
+              <li>No account or sign-in</li>
+              <li>100% on-device Whisper &amp; Qwen3 processing</li>
+              <li>No cloud AI uploads</li>
+              <li>No ads, analytics, or telemetry</li>
+              <li>One-time SHA-256 verified model downloads from Hugging Face</li>
+              <li>Delete audio while keeping transcripts &amp; summaries</li>
+              <li>iOS models excluded from iCloud Backup; Android <code>allowBackup=false</code></li>
+            </ul>
+            <p>Questions about privacy?<br><a href="mailto:appalapas@gmail.com?subject=NotedTS%20Privacy">appalapas@gmail.com</a></p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>© 2026 Appalapa · Jose Leyva · Privacy Policy for NotedTS (<code>com.appalapa.notedts</code>)</p>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="/notedts">Overview</a>
+          <a href="/notedts/support">Support</a>
+          <a href="mailto:appalapas@gmail.com">appalapas@gmail.com</a>
+          <a href="/">leyvaje</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>
